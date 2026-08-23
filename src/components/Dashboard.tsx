@@ -1,10 +1,10 @@
 import { useState, useEffect, type ReactNode } from "react";
 import {
-  Shield, Layers, AlertTriangle, Satellite, GraduationCap,
+  Layers, AlertTriangle, Satellite, GraduationCap,
   Briefcase, Award, Droplet, X, ExternalLink, MapPin,
   Star, ChevronLeft, ChevronRight, Calendar,
-  Wrench, FolderKanban, FileText, Crosshair, Cpu, Activity,
-  Trophy, BookOpen, Info, ArrowUpRight, Mail, Radio,
+  Wrench, FolderKanban, FileText, Cpu,
+  Trophy, BookOpen, Info,
 } from "lucide-react";
 import type { CableMeta, CablePath, LayerId } from "../hooks/useLayers";
 import { LAYER_GROUPS } from "../hooks/useLayers";
@@ -143,22 +143,7 @@ export function Dashboard({ active, onToggle, selected, onSelect, entries, overl
         <a className="hero-brand" href="https://arosha.au" aria-label="Arosha Kaluarachchi home">
           <span className="hero-avatar-wrap"><img src={githubProfile.avatar} alt="Arosha Kaluarachchi"/><i /></span>
           <span className="hero-identity"><b>Arosha Kaluarachchi</b><small>Senior Network Engineer · AI & Automation</small></span>
-          <span className="hero-domain">arosha<span>.au</span><ArrowUpRight size={11}/></span>
         </a>
-
-        <div className="hero-focus" aria-label="Areas of expertise">
-          <span><Radio size={11}/> Agentic delivery</span>
-          <i />
-          <span><Activity size={11}/> Infrastructure automation</span>
-          <i />
-          <span><Shield size={11}/> Production safety</span>
-        </div>
-
-        <div className="hero-actions">
-          <span className="hero-location"><Crosshair size={10}/> Melbourne, AU</span>
-          <span className="hero-availability"><i/> Open to conversations</span>
-          <a href="mailto:aroshak@gmail.com" className="hero-contact"><Mail size={13}/><span>Contact</span></a>
-        </div>
       </header>
 
       <aside className="absolute left-4 top-20 bottom-28 w-[244px] pointer-events-auto z-20">
