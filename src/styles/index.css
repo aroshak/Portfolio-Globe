@@ -378,6 +378,11 @@ body {
 .build-hero p { max-width:720px; margin-top:34px; }
 .build-pill-row { display:flex; flex-wrap:wrap; gap:9px; margin-top:40px; }
 .build-pill-row span { display:flex; align-items:center; gap:7px; padding:9px 12px; border:1px solid rgba(255,255,255,.1); border-radius:999px; color:#8aa0b0; font-size:11px; }
+.build-source { display:grid; grid-template-columns:1fr auto; gap:50px; align-items:center; margin-top:64px; padding:34px; border:1px solid rgba(74,222,222,.2); border-radius:16px; background:linear-gradient(135deg,rgba(74,222,222,.07),rgba(13,20,27,.72)); }
+.build-source span { color:#4adede; font:600 9px "JetBrains Mono",monospace; letter-spacing:.15em; }
+.build-source h2 { margin:10px 0 8px; color:#e8f4f8; font-size:25px; letter-spacing:-.03em; }
+.build-source p { max-width:680px; margin:0; font-size:13px; }
+.build-source>a { display:flex; align-items:center; gap:8px; padding:13px 16px; border-radius:10px; color:#051014; background:#4adede; font-size:11px; font-weight:750; text-decoration:none; }
 .project-step { display:grid; flex:none; place-items:center; width:22px; height:22px; border:1px solid; border-radius:50%; font:600 9px "JetBrains Mono",monospace; }
 
 /* Three.js GitHub repository carousel */
@@ -406,6 +411,8 @@ body {
   .career-track { grid-template-columns:repeat(2,1fr); }
   .repo-showcase-head { align-items:flex-start; flex-direction:column; gap:24px; }
   .repo-canvas { width:calc(100% - 24px); height:390px; border-radius:18px; }
+  .build-source { grid-template-columns:1fr; gap:24px; }
+  .build-source>a { justify-self:start; }
 }
 @media (max-width:620px) {
   .page-shell,.portfolio-nav { width:min(100% - 32px,1180px); }

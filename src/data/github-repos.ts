@@ -46,6 +46,37 @@ export const githubProfile: GitHubProfile = {
 
 export const githubRepos: GitHubRepo[] = [
   {
+    id: "portfolio-globe",
+    name: "Portfolio-Globe",
+    url: "https://github.com/aroshak/Portfolio-Globe",
+    description: "Reusable interactive portfolio with a Three.js career globe and GitHub project explorer",
+    summary:
+      "An open, reusable engineering portfolio built with React, TypeScript and Three.js. It maps education and career history onto an interactive globe, presents GitHub repositories in a 3D carousel, renders Markdown engineering case studies as readable pages, and includes a detailed guide so other professionals can adapt the system for their own career.",
+    highlights: [
+      "Interactive globe for education, experience, certifications and infrastructure layers",
+      "Dynamic GitHub repository discovery with curated project enrichment and cached fallback",
+      "3D repository carousel with detailed project and usage panels",
+      "Markdown case-study reader with responsive typography and generated navigation",
+      "Comprehensive reuse guide covering content, privacy, deployment and customisation",
+    ],
+    usage: [
+      "Clone the repository and run `npm install`.",
+      "Update identity, education, experience and certification data in `src/data/portfolio-data.json`.",
+      "Update the GitHub profile and optional curated repository descriptions in `src/data/github-repos.ts`.",
+      "Run `npm run dev`, then follow the README before building and publishing your version.",
+    ],
+    stack: ["React", "TypeScript", "Three.js", "Vite", "Tailwind CSS"],
+    language: "TypeScript",
+    stars: 0,
+    forks: 0,
+    license: "Repository terms",
+    created: "Aug 2026",
+    updated: "Aug 2026",
+    category: "Open Portfolio System",
+    accent: "#4adede",
+    featured: true,
+  },
+  {
     id: "cisco-ssh-mcp",
     name: "cisco-ssh-mcp",
     url: "https://github.com/aroshak/cisco-ssh-mcp",
@@ -190,3 +221,91 @@ export const githubRepos: GitHubRepo[] = [
     accent: "#4a6070",
   },
 ];
+
+interface GitHubApiRepo {
+  id: number;
+  name: string;
+  html_url: string;
+  description: string | null;
+  language: string | null;
+  stargazers_count: number;
+  forks_count: number;
+  license: { spdx_id?: string; name?: string } | null;
+  created_at: string;
+  updated_at: string;
+  topics?: string[];
+  archived: boolean;
+  fork: boolean;
+}
+
+const repoCacheKey = "portfolio_github_repos_v1";
+const repoCacheAge = 1000 * 60 * 15;
+
+function formatGitHubDate(value: string) {
+  return new Intl.DateTimeFormat("en-AU", { month: "short", year: "numeric" }).format(new Date(value));
+}
+
+function mergeGitHubRepo(repo: GitHubApiRepo): GitHubRepo {
+  const curated = githubRepos.find((item) => item.name.toLowerCase() === repo.name.toLowerCase());
+  if (curated) return {
+    ...curated,
+    url: repo.html_url,
+    description: curated.description || repo.description || "Public GitHub repository",
+    language: repo.language || curated.language,
+    stars: repo.stargazers_count,
+    forks: repo.forks_count,
+    license: repo.license?.spdx_id || repo.license?.name || curated.license,
+    created: formatGitHubDate(repo.created_at),
+    updated: formatGitHubDate(repo.updated_at),
+  };
+  return {
+    id: `github-${repo.id}`,
+    name: repo.name,
+    url: repo.html_url,
+    description: repo.description || "Public engineering repository",
+    summary: repo.description
+      ? `${repo.description}. Open the repository for its source code, documentation, setup instructions and current development history.`
+      : "A public GitHub repository. Open the repository to review its source code, README, setup instructions and current development history.",
+    highlights: [
+      repo.language ? `Primary language: ${repo.language}` : "Public source repository",
+      ...(repo.topics || []).slice(0, 3).map((topic) => `Topic: ${topic}`),
+      repo.archived ? "Archived project retained for reference" : "Actively available on GitHub",
+    ],
+    usage: [
+      "Open the repository on GitHub.",
+      "Read its README and inspect the dependency or configuration files.",
+      "Clone the repository and follow its project-specific setup instructions.",
+    ],
+    stack: [repo.language, ...(repo.topics || []).slice(0, 4)].filter(Boolean) as string[],
+    language: repo.language || "—",
+    stars: repo.stargazers_count,
+    forks: repo.forks_count,
+    license: repo.license?.spdx_id || repo.license?.name || "Not specified",
+    created: formatGitHubDate(repo.created_at),
+    updated: formatGitHubDate(repo.updated_at),
+    category: repo.archived ? "Archive" : "GitHub Project",
+    accent: repo.archived ? "#4a6070" : "#4adede",
+  };
+}
+
+export async function loadGitHubRepos(): Promise<GitHubRepo[]> {
+  try {
+    const cached = JSON.parse(localStorage.getItem(repoCacheKey) || "null");
+    if (cached?.timestamp && Date.now() - cached.timestamp < repoCacheAge && Array.isArray(cached.repos)) return cached.repos;
+  } catch { /* ignore invalid cache */ }
+  try {
+    const response = await fetch("https://api.github.com/users/aroshak/repos?per_page=100&sort=updated", {
+      headers: { Accept: "application/vnd.github+json" },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!response.ok) throw new Error(`GitHub returned HTTP ${response.status}`);
+    const apiRepos = await response.json() as GitHubApiRepo[];
+    const live = apiRepos.filter((repo) => !repo.fork).map(mergeGitHubRepo);
+    const missingCurated = githubRepos.filter((curated) => !live.some((repo) => repo.name.toLowerCase() === curated.name.toLowerCase()));
+    const merged = [...live, ...missingCurated].sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || b.updated.localeCompare(a.updated));
+    localStorage.setItem(repoCacheKey, JSON.stringify({ timestamp: Date.now(), repos: merged }));
+    return merged;
+  } catch {
+    return githubRepos;
+  }
+}
