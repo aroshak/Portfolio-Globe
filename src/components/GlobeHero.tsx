@@ -237,11 +237,11 @@ export function GlobeHero({
     if (flightTimer.current !== null) window.clearTimeout(flightTimer.current);
     // First travel above the destination so long-distance moves are obvious,
     // then descend to the selected pin for the detail view.
-    g.pointOfView({ lat: flyTarget.lat, lng: flyTarget.lng, altitude: 1.9 }, 850);
+    g.pointOfView({ lat: flyTarget.lat, lng: flyTarget.lng, altitude: 2.15 }, 1800);
     flightTimer.current = window.setTimeout(() => {
-      g.pointOfView({ lat: flyTarget.lat, lng: flyTarget.lng, altitude: 0.72 }, 1150);
-      window.setTimeout(() => { if (controls) controls.enabled = true; }, 1200);
-    }, 875);
+      g.pointOfView({ lat: flyTarget.lat, lng: flyTarget.lng, altitude: 0.42 }, 2600);
+      window.setTimeout(() => { if (controls) controls.enabled = true; }, 2700);
+    }, 1950);
     return () => { if (flightTimer.current !== null) window.clearTimeout(flightTimer.current); };
   }, [flyTarget]);
 

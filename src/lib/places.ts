@@ -6,7 +6,7 @@
 
 const API_KEY = import.meta.env.VITE_GOOGLE_PLACES_API_KEY as string;
 
-const CACHE_PREFIX = "places_full_v4_";
+const CACHE_PREFIX = "places_full_v5_";
 const CACHE_MAX_AGE = 1000 * 60 * 60 * 24 * 7;
 
 export interface PlaceInfo {
@@ -91,26 +91,49 @@ function loadPlacesApi(): Promise<any> {
 }
 
 async function fetchWikipediaPlaceInfo(query: string): Promise<PlaceInfo | null> {
-  const url = new URL("https://en.wikipedia.org/w/rest.php/v1/search/page");
-  url.searchParams.set("q", query);
-  url.searchParams.set("limit", "1");
-  const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
-  if (!response.ok) return null;
-  const result = await response.json();
-  const page = result?.pages?.[0];
-  if (!page) return null;
-
+  const [entity, city = ""] = query.split(",").map((value) => value.trim());
+  const searches = [`${entity} ${city}`.trim(), entity, city].filter(Boolean);
+  let fallback: any = null;
+  for (const search of searches) {
+    const url = new URL("https://en.wikipedia.org/w/rest.php/v1/search/page");
+    url.searchParams.set("q", search);
+    url.searchParams.set("limit", "5");
+    const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
+    if (!response.ok) continue;
+    const result = await response.json();
+    const pages = Array.isArray(result?.pages) ? result.pages : [];
+    fallback ||= pages[0];
+    const page = pages.find((candidate: any) => candidate?.thumbnail?.url);
+    if (!page) continue;
+    const rawPhoto = String(page.thumbnail.url);
+    const photoUri = rawPhoto.startsWith("//") ? `https:${rawPhoto}` : rawPhoto;
+    return {
+      displayName: entity || page.title || query,
+      formattedAddress: city,
+      googleMapsUri: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`,
+      rating: null,
+      userRatingCount: null,
+      editorialSummary: page.description || null,
+      primaryType: null,
+      primaryTypeDisplayName: "Wikipedia article",
+      photoUri,
+      photoAttribution: "Wikimedia Commons",
+      types: [],
+      source: "wikipedia",
+    };
+  }
+  if (!fallback) return null;
   return {
-    displayName: page.title || query,
+    displayName: entity || fallback.title || query,
     formattedAddress: "",
-    googleMapsUri: "",
+    googleMapsUri: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`,
     rating: null,
     userRatingCount: null,
-    editorialSummary: page.description || null,
+    editorialSummary: fallback.description || null,
     primaryType: null,
     primaryTypeDisplayName: "Wikipedia article",
-    photoUri: page.thumbnail?.url || null,
-    photoAttribution: page.thumbnail?.url ? "Wikimedia Commons" : null,
+    photoUri: null,
+    photoAttribution: null,
     types: [],
     source: "wikipedia",
   };
@@ -121,7 +144,7 @@ async function fetchWikipediaPlaceInfo(query: string): Promise<PlaceInfo | null>
  * Pass org name + location, e.g. "Mahanama College, Colombo" or
  * "Northumbria University, Newcastle upon Tyne".
  */
-export async function fetchPlaceInfo(query: string): Promise<PlaceInfo | null> {
+export async function fetchPlaceInfo(query: string, coords?: { lat: number; lng: number }): Promise<PlaceInfo | null> {
   const cacheKey = query.toLowerCase().replace(/[^a-z0-9]+/g, "_");
   const cached = getCached(cacheKey);
   if (cached) return cached;
@@ -144,6 +167,7 @@ export async function fetchPlaceInfo(query: string): Promise<PlaceInfo | null> {
         "photos",
       ],
       maxResultCount: 1,
+      ...(coords ? { locationBias: { center: coords, radius: 50000 } } : {}),
     });
 
     const place = places?.[0];
@@ -175,6 +199,13 @@ export async function fetchPlaceInfo(query: string): Promise<PlaceInfo | null> {
       source: "google",
     };
 
+    if (!info.photoUri) {
+      const wiki = await fetchWikipediaPlaceInfo(query).catch(() => null);
+      if (wiki?.photoUri) {
+        info.photoUri = wiki.photoUri;
+        info.photoAttribution = wiki.photoAttribution;
+      }
+    }
     setCache(cacheKey, info);
     return info;
   } catch (err) {

@@ -105,24 +105,27 @@ export function Dashboard({ active, onToggle, selected, onSelect, entries, overl
   const [enriched, setEnriched] = useState<EnrichedEntry | null>(null);
   const [placeInfo, setPlaceInfo] = useState<PlaceInfo | null>(null);
   const [imgLoading, setImgLoading] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
 
   useEffect(() => {
     if (!selected) {
       setEnriched(null);
       setPlaceInfo(null);
       setImgLoading(false);
+      setImgFailed(false);
       return;
     }
     let cancelled = false;
     const e = getEnrichedEntry(selected.id);
     setEnriched(e || null);
     setPlaceInfo(null);
+    setImgFailed(false);
 
     // Search the actual entity: "Mahanama College, Colombo" etc.
     const city = selected.location.name.split(",")[0].trim();
     const query = `${selected.org}, ${city}`;
     setImgLoading(true);
-    fetchPlaceInfo(query).then((info) => {
+    fetchPlaceInfo(query, { lat: selected.location.lat, lng: selected.location.lng }).then((info) => {
       if (cancelled) return;
       setPlaceInfo(info);
       setImgLoading(false);
@@ -244,17 +247,20 @@ export function Dashboard({ active, onToggle, selected, onSelect, entries, overl
             {/* ── HERO: entity image + identity overlay ── */}
             <div className="relative w-full h-40 rounded-xl overflow-hidden shrink-0 border"
               style={{ boxShadow: `0 8px 32px rgba(0,0,0,0.5), inset 0 0 0 1px ${color}33` }}>
-              {photo ? (
+              {photo && !imgFailed ? (
                 <img src={photo} alt={placeInfo?.displayName || enriched.org}
+                  onLoad={() => setImgLoading(false)} onError={() => { setImgFailed(true); setImgLoading(false); }}
                   className="absolute inset-0 w-full h-full object-cover" />
               ) : imgLoading ? (
                 <div className="absolute inset-0 flex items-center justify-center bg-space-deep">
                   <div className="w-6 h-6 border-2 border-cyan-glow/40 border-t-cyan-glow rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-space-deep">
-                  <span className="text-[11px] font-mono text-text-muted tracking-[0.2em]">
-                    {enriched.org.toUpperCase()}
+                <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-space-deep">
+                  <div className="absolute inset-0 opacity-70" style={{ background: `radial-gradient(circle at 28% 20%, ${color}45, transparent 42%), linear-gradient(135deg, #101923, #050810)` }} />
+                  <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px)", backgroundSize: "24px 24px" }} />
+                  <span className="relative text-[11px] font-mono text-text-secondary tracking-[0.2em] text-center px-8">
+                    {enriched.org.toUpperCase()}<small className="block mt-2 text-[8px] text-text-muted">{enriched.location.name.toUpperCase()}</small>
                   </span>
                 </div>
               )}
