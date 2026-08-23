@@ -339,6 +339,7 @@ export function GlobeHero({
         width={size[0]}
         height={size[1]}
         backgroundColor="#050810"
+        backgroundImageUrl="https://cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png"
         globeImageUrl="/textures/earth-night.jpg"
         bumpImageUrl="/textures/earth-bump-8k.jpg"
         showAtmosphere
