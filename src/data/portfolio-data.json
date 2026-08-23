@@ -1,0 +1,319 @@
+{
+  "person": {
+    "name": "Arosha Kaluarachchi",
+    "title": "Senior Network Engineer · Network Automation & AI",
+    "tagline": "15+ years building enterprise networks, then automating them away.",
+    "location": "Melbourne, Australia",
+    "email": "aroshak@gmail.com",
+    "workEmail": "aroshak@gmail.com",
+    "links": {
+      "github": "https://github.com/aroshak",
+      "linkedin": "https://au.linkedin.com/in/arosha-kalu",
+      "site": "https://carepilot.au"
+    }
+  },
+  "home": {
+    "name": "Melbourne, AU",
+    "lat": -37.8136,
+    "lng": 144.9631,
+    "zoom": 0.05
+  },
+  "journey": [
+    {
+      "from": "Colombo",
+      "to": "Newcastle upon Tyne",
+      "label": "Northumbria University (2008)",
+      "year": 2008
+    },
+    {
+      "from": "Newcastle upon Tyne",
+      "to": "London",
+      "label": "NSC Global · RBS/NATWEST (2010)",
+      "year": 2010
+    },
+    {
+      "from": "London",
+      "to": "Sydney",
+      "label": "Exetel · ISP & enterprise (2012)",
+      "year": 2012
+    },
+    {
+      "from": "Sydney",
+      "to": "Melbourne",
+      "label": "Telstra · Capacity Planning (2017)",
+      "year": 2017
+    },
+    {
+      "from": "Melbourne",
+      "to": "Bendigo",
+      "label": "Bendigo Telco · modernisation (2017)",
+      "year": 2017
+    },
+    {
+      "from": "Bendigo",
+      "to": "Sydney",
+      "label": "Tecala Group · MSP (2022)",
+      "year": 2022
+    },
+    {
+      "from": "Sydney",
+      "to": "Melbourne",
+      "label": "Civica · Senior Network Engineer (2023)",
+      "year": 2023
+    }
+  ],
+  "entries": [
+    {
+      "id": "edu-1996-ol",
+      "tab": "education",
+      "title": "G.C.E. Ordinary Level",
+      "org": "Mahanama College",
+      "location": { "name": "Colombo, LK", "lat": 6.9271, "lng": 79.8612 },
+      "period": "1996 – 2001",
+      "cards": [
+        { "heading": "Secondary Foundation", "body": "Successfully completed G.C.E. Ordinary Level at Mahanama College, Colombo — one of Sri Lanka's leading public schools, established 1922. Six years of rigorous secondary education in Mathematics, Science, English, and Social Studies." },
+        { "heading": "School Activities", "body": "Senior Scout of the College Scout Troop. Active member of the College Maths Society and College Wushu Society. These extracurricular activities built leadership, discipline, and teamwork skills from an early age." }
+      ]
+    },
+    {
+      "id": "edu-2001-al",
+      "tab": "education",
+      "title": "G.C.E. Advanced Level — University Entrance",
+      "org": "Mahanama College",
+      "location": { "name": "Colombo, LK", "lat": 6.9271, "lng": 79.8612 },
+      "period": "2001 – 2005",
+      "cards": [
+        { "heading": "Higher Secondary", "body": "Successfully completed G.C.E. Advanced Level — the national university entrance qualification. Mathematics and Science stream. This four-year programme prepared the foundation for undergraduate engineering studies." },
+        { "heading": "Leadership Roles", "body": "President of the College Radio Club (2003/2004). President of the College Amateur Radio Club (2003/2004). Vice President of the College Photographic Society (2003/2004). These leadership roles sparked the early interest in radio communications that later became a career." }
+      ]
+    },
+    {
+      "id": "edu-2005-cg-tech",
+      "tab": "education",
+      "title": "City & Guilds Technician Diploma — Telecommunication Systems 2730",
+      "org": "City and Guilds of London Institute",
+      "location": { "name": "Colombo, LK", "lat": 6.9271, "lng": 79.8612 },
+      "period": "2005 – 2006",
+      "cards": [
+        { "heading": "NVQ Level 3", "body": "Full Technician Diploma in Telecommunication Systems. Five modules completed covering electronics, digital networks, and radio systems." },
+        { "heading": "Subjects", "body": "Fundamentals of Electronics & Communications 2, Communication Systems & Digital Networks 2, Fundamentals of Electronics & Communications 3, Communication Systems & Digital Networks 3, and Radio Systems." }
+      ]
+    },
+    {
+      "id": "cert-2006-4s7bu",
+      "tab": "certifications",
+      "title": "Licensed Radio Amateur — Call Sign 4S7BU",
+      "org": "Radio Society of Sri Lanka",
+      "location": { "name": "Colombo, LK", "lat": 6.9271, "lng": 79.8612 },
+      "period": "2006",
+      "cards": [
+        { "heading": "License", "body": "Licensed radio amateur by the national regulatory authority. Call sign 4S7BU. Practical mastery of VHF/UHF operations, radio propagation, antenna theory, and emergency communications protocols." }
+      ]
+    },
+    {
+      "id": "edu-2006-cg-adv",
+      "tab": "education",
+      "title": "City & Guilds Advanced Technician Diploma — Telecommunication Systems 2730",
+      "org": "City and Guilds of London Institute",
+      "location": { "name": "Colombo, LK", "lat": 6.9271, "lng": 79.8612 },
+      "period": "2006 – 2008",
+      "cards": [
+        { "heading": "NVQ Level 4", "body": "Advanced Technician Diploma — the highest City & Guilds vocational qualification. Advanced-level study in radio systems, telecommunication systems, and a capstone project." },
+        { "heading": "Subjects", "body": "Advanced Radio Systems, Advanced Telecommunication Systems, and the Advanced Telecommunication Project." }
+      ]
+    },
+    {
+      "id": "work-2006-rssl",
+      "tab": "experience",
+      "title": "VHF Activity Manager (Volunteer)",
+      "org": "Radio Society of Sri Lanka",
+      "location": { "name": "Colombo, LK", "lat": 6.9271, "lng": 79.8612 },
+      "period": "Sep 2006 – Sep 2007",
+      "cards": [
+        { "heading": "Volunteer Leadership", "body": "Honorary volunteer role — not employment. Managed the daily VHF net and coordinated VHF activities organised by the society, keeping Sri Lanka's amateur radio community connected." },
+        { "heading": "On-Air Operations", "body": "Regular on-air coordination as 4S7BU. Built communication discipline, call-sign protocols, and real-time radio traffic management skills that translated directly to network operations." }
+      ]
+    },
+    {
+      "id": "work-2006-suntel",
+      "tab": "experience",
+      "title": "Trainee Technical Officer",
+      "org": "Suntel Telecom Ltd",
+      "location": { "name": "Colombo, LK", "lat": 6.9271, "lng": 79.8612 },
+      "period": "Nov 2006 – Jun 2007",
+      "cards": [
+        { "heading": "Access Networks", "body": "Hands-on operations across DRA 1900, CDMA, AIRSPAN, and WipLL access technologies. Conducted drive testing using TEMS Drive Tester and CDMA site surveys for network expansion." },
+        { "heading": "Transmission Engineering", "body": "SDH and PDH transmission systems. Microwave link planning and path surveys using Path Loss software. Link budget calculations for point-to-point radio links." },
+        { "heading": "Planning & Implementation", "body": "WiMax testing for new deployments. Alvarion Walkair System testing. Assisted in ISP operations for WOW.lk — Suntel's consumer internet brand." },
+        { "heading": "Network Operations", "body": "Worked in the OMC (Operation & Maintenance Centre) using NMS platforms. DC power systems, generator maintenance, and structured cabling for telecom sites." }
+      ]
+    },
+    {
+      "id": "work-2007-debug",
+      "tab": "experience",
+      "title": "Marketing Executive — Technical Support",
+      "org": "Debug Equipment Trades Ltd",
+      "location": { "name": "Colombo, LK", "lat": 6.9271, "lng": 79.8612 },
+      "period": "Aug 2007 – Aug 2008",
+      "cards": [
+        { "heading": "Debug Group", "body": "Debug Equipment Trades Ltd — part of Sri Lanka's Debug Group of Companies (debug.lk), a leading provider of radio communication, security, and electronic systems." },
+        { "heading": "Technical Sales", "body": "Bridged engineering and business — educated enterprise customers about Private Mobile Radio (PMR) communication systems. Designed and proposed Radio Trunking and Repeater solutions for commercial clients." },
+        { "heading": "Client Solutions", "body": "Translated technical RF concepts into business value. Gained early experience in consultative selling of complex technical systems — a skill that later proved essential for stakeholder management in large-scale network projects." }
+      ]
+    },
+    {
+      "id": "edu-2008-northumbria",
+      "tab": "education",
+      "title": "BEng (Hons) Mobile Communication Technologies",
+      "org": "Northumbria University",
+      "location": { "name": "Newcastle upon Tyne, UK", "lat": 54.9783, "lng": -1.6178 },
+      "period": "2008 – 2009",
+      "cards": [
+        { "heading": "Degree", "body": "Bachelor of Engineering with Honours in Mobile Communication Technologies. The academic foundation for a career spanning mobile, RF, and enterprise networking." },
+        { "heading": "Key Modules", "body": "Applied Computer Networks 1, Mobile Communications, Academic Communication, Principles of Wireless Computer Networks, Design Technology Project, Mobile Systems Hardware Technologies, and Project Management & Professional Development." },
+        { "heading": "International Move", "body": "First major relocation — Colombo to Newcastle upon Tyne. Adapted to UK higher education, built a new professional network, and completed the degree in a new country." }
+      ]
+    },
+    {
+      "id": "work-2010-nsc",
+      "tab": "experience",
+      "title": "Field Network Engineer",
+      "org": "NSC Global Pvt Ltd",
+      "location": { "name": "London, UK", "lat": 51.5074, "lng": -0.1278 },
+      "period": "Dec 2010 – Jul 2012",
+      "cards": [
+        { "heading": "Banking Networks", "body": "End-to-end network support for RBS (Royal Bank of Scotland) and NATWEST — two of the UK's largest retail banks. VOIP migration across the banking estate, site surveys, and network commissioning." },
+        { "heading": "Vendor Collaboration", "body": "Worked alongside AT&T on joint network deployments. Gained exposure to enterprise-scale financial services infrastructure and the compliance requirements of regulated environments." }
+      ]
+    },
+    {
+      "id": "work-2012-exetel",
+      "tab": "experience",
+      "title": "Network Engineer",
+      "org": "Exetel Pty Ltd",
+      "location": { "name": "Sydney, AU", "lat": -33.8688, "lng": 151.2093 },
+      "period": "Oct 2012 – Jan 2017",
+      "cards": [
+        { "heading": "Core ISP Operations", "body": "Operated a national ISP backbone: Cisco ISR 7200/2800, Catalyst 3500/6500, Nexus 7000, ASR 9000. Advanced BGP, MPLS-VPN, and policy-based routing across the core." },
+        { "heading": "Enterprise Clients", "body": "Melbourne Airport (QoS VoIP deployment), Coca-Cola Amatil (private VPN to US headquarters), Seventh Day Adventist Church (multi-site MPLS-VPN across Australia)." },
+        { "heading": "International Move", "body": "Relocated from London to Sydney — the third country in a growing international career. Adapted to Australian telecom standards and the national broadband environment." }
+      ]
+    },
+    {
+      "id": "cert-2015-ccnp",
+      "tab": "certifications",
+      "title": "CCNP — Cisco Certified Network Professional",
+      "org": "Cisco Systems",
+      "location": { "name": "Remote / Cisco", "lat": 37.408, "lng": -121.963 },
+      "period": "2015",
+      "cards": [
+        { "heading": "Scope", "body": "Professional-level enterprise routing, switching, and troubleshooting. The CCNP certification validates the skills that became core to the ASA→FTD migration programme, SD-WAN deployments, and multi-site MPLS architecture." }
+      ]
+    },
+    {
+      "id": "work-2017-telstra",
+      "tab": "experience",
+      "title": "Network Capacity Planner",
+      "org": "Telstra",
+      "location": { "name": "Melbourne, AU", "lat": -37.8136, "lng": 144.9631 },
+      "period": "Apr 2017 – Nov 2017",
+      "cards": [
+        { "heading": "National Forecasting", "body": "Capacity planning for Telstra's national infrastructure with 3–5 year forecasting horizons. Managed cache planning relationships with Google, Netflix, and Akamai for CDN optimisation across the Telstra network." },
+        { "heading": "Financial Planning", "body": "CAPEX and OPEX optimisation for national-scale infrastructure. Built forecasting models that balanced growth projections against infrastructure investment cycles." }
+      ]
+    },
+    {
+      "id": "work-2017-bendigo",
+      "tab": "experience",
+      "title": "Network Engineer / Specialist",
+      "org": "Bendigo Telco",
+      "location": { "name": "Bendigo, AU", "lat": -36.757, "lng": 144.2794 },
+      "period": "Nov 2017 – Jul 2022",
+      "cards": [
+        { "heading": "Infrastructure Transformation", "body": "Led end-to-end transformation of 10+ Points of Presence nationwide. Deployed ASR 9000, NCS 5500, and Nexus 9000 platforms — modernising the core, aggregation, and edge layers." },
+        { "heading": "SD-WAN Leadership", "body": "Technical lead for Viptela SD-WAN proof-of-concept for Bendigo Bank — one of Australia's largest regional banks. Designed DIA + MPLS hybrid architecture for 200+ branches." },
+        { "heading": "Service Innovation", "body": "Sandvine subscriber management and traffic steering. Built custom L2 Xconnect failover mechanism. Designed 4G→4G BGP failover for energy sector SCADA networks. Delivered EVPN fabric in under 3 days for a critical customer deployment." }
+      ]
+    },
+    {
+      "id": "work-2022-tecala",
+      "tab": "experience",
+      "title": "Senior Network Engineer",
+      "org": "Tecala Group",
+      "location": { "name": "Sydney, AU", "lat": -33.8688, "lng": 151.2093 },
+      "period": "May 2022 – Feb 2023",
+      "cards": [
+        { "heading": "Multi-Vendor MSP", "body": "Managed diverse enterprise environments: Juniper routing/switching, NSX-T virtualisation, Fortinet and Palo Alto NGFW, F5 load balancers with CGNAT. Security audits across all firewall platforms." },
+        { "heading": "Consulting Breadth", "body": "Short but intense engagement across multiple enterprise clients. Gained rapid exposure to varied architectures and the MSP delivery model — a valuable contrast to deep-specialist roles." }
+      ]
+    },
+    {
+      "id": "work-2023-roong",
+      "tab": "experience",
+      "title": "Technical Co-Founder & AI Developer",
+      "org": "Independent / ROONG",
+      "location": { "name": "Colombo, LK (roong.lk)", "lat": 6.9271, "lng": 79.8612 },
+      "period": "Jan 2023 – Present",
+      "cards": [
+        { "heading": "ROONG", "body": "Single-handedly architected and deployed an AI-powered online supermarket — roong.lk — serving real customers and generating revenue. Full product lifecycle from concept to production." },
+        { "heading": "AI Stack", "body": "Next.js 15 + TypeScript frontend. Supabase backend on GCP Cloud Run. LangGraph agent workflows. RAG with vector databases (Pinecone, Supabase Vector). OpenAI and Anthropic API integration for automated customer-service agents." },
+        { "heading": "Portfolio Breadth", "body": "Built 5+ AI applications spanning e-commerce, customer service automation, document synthesis, and compliance auditing. The bridge between enterprise networking and AI product engineering." }
+      ]
+    },
+    {
+      "id": "work-2023-civica",
+      "tab": "experience",
+      "title": "Senior Network Engineer",
+      "org": "Civica Pty Ltd",
+      "location": { "name": "Melbourne, AU", "lat": -37.8136, "lng": 144.9631 },
+      "period": "Aug 2023 – Present",
+      "cards": [
+        { "heading": "Enterprise Mandate", "body": "Enterprise Cisco datacentre networks, NGFW, and load balancers across multi-cloud environments (GCP, AWS, Azure). The ASA→FTD firewall migration programme — the largest body of work — lives here." },
+        { "heading": "Automation at Scale", "body": "Terraform Infrastructure as Code. GitHub Actions CI/CD pipelines. AI automation with MCP (Model Context Protocol) — bridging the gap between AI agents and network infrastructure." },
+        { "heading": "Showcase Projects", "body": "Three major automation projects: Cisco FMC Ansible Migration Toolchain (23 playbooks, 14 utilities, 6 roles), Network Automation Cutover Engine (Dockerised pyATS/Netmiko/Ansible), and Network Topology → Neo4j Graph (live device state modelling for blast-radius analysis)." }
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "fmc-ansible",
+      "title": "Cisco FMC Ansible Migration Toolchain",
+      "tag": "Network Automation",
+      "repo": "FMCAnsible",
+      "summary": "Extended cisco.fmcansible with 23 migration playbooks, 14 Python utilities, 6 roles and Swagger/OAS3 maps. Idempotent, stage-safe ASA→FTD config migration across M1/M2 data centres.",
+      "stack": ["Ansible", "Python", "Cisco FMC/FTD", "Docker", "OpenAPI"],
+      "location": { "name": "M1/M2 Data Centres, AU", "lat": -37.81, "lng": 144.96 },
+      "doc": "Aroshas_details/fmc_ansible_migration.md"
+    },
+    {
+      "id": "cutover-engine",
+      "title": "Network Automation Cutover Engine",
+      "tag": "Network Automation",
+      "repo": "network-automation",
+      "summary": "Dockerised pyATS/Netmiko/Ansible engine: baseline → cutover → verify for ASA→FTD across M1/M2/SY3/Azure. Difflib/Genie diff reports, semantic exit codes, full evidence trail.",
+      "stack": ["pyATS/Genie", "Netmiko", "Ansible", "Docker", "Python"],
+      "location": { "name": "M1/M2/SY3/Azure", "lat": -37.81, "lng": 144.96 },
+      "doc": "Aroshas_details/network_automation_cutover.md"
+    },
+    {
+      "id": "neo4j-topology",
+      "title": "Network Topology → Neo4j Graph",
+      "tag": "Network Automation",
+      "repo": "network-topology",
+      "summary": "Collector ingests live device state (CDP, interfaces, VRFs, VLANs, routing) and models the ~40-device estate as a queryable Neo4j graph for change blast-radius analysis.",
+      "stack": ["Neo4j", "Cypher", "Python", "Ansible", "CDP/LLDP"],
+      "location": { "name": "GrIT/M1/M2/SY3/Azure", "lat": -37.81, "lng": 144.96 },
+      "doc": "Aroshas_details/network_topology_neo4j.md"
+    },
+    {
+      "id": "roong",
+      "title": "ROONG — AI E-Commerce Platform",
+      "tag": "AI Product",
+      "repo": "roong.lk",
+      "summary": "Single-handedly architected & deployed an AI-powered online supermarket in production — real revenue, active customers. Full product lifecycle.",
+      "stack": ["Next.js 15", "TypeScript", "Supabase", "GCP Cloud Run", "LangGraph", "OpenAI"],
+      "location": { "name": "Colombo, LK", "lat": 6.9271, "lng": 79.8612 },
+      "link": "https://roong.lk"
+    }
+  ]
+}

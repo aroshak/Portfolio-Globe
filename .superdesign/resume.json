@@ -1,0 +1,32 @@
+{
+  "projectId": "4ea61cc5-fab4-4db7-b190-41085f4f649f",
+  "projectTitle": "Arosha Portfolio — AI, Automation & Infrastructure",
+  "targets": {
+    "landing": {
+      "route": "/",
+      "baselineDraftId": "b65853e2-f0c9-4afe-a690-bef4eff854b4",
+      "activeDraftId": "b65853e2-f0c9-4afe-a690-bef4eff854b4",
+      "status": "awaiting-user-selection",
+      "branches": [
+        {
+          "draftId": "fa5d2ed8-4ffd-4119-bb13-f864f3be73b2",
+          "description": "Executive editorial direction led by What I bring"
+        },
+        {
+          "draftId": "44b93976-877d-4f70-966c-420a26d701b3",
+          "description": "Conversion-focused direction led by What I can offer your team"
+        }
+      ],
+      "contextFiles": [
+        ".superdesign/design-system.md",
+        ".superdesign/init/theme.md",
+        "src/App.tsx",
+        "src/components/ServicesPanel.tsx",
+        "src/components/BuildStory.tsx",
+        "src/components/ProjectGrid.tsx:1:180",
+        "src/data/services.ts",
+        "src/data/portfolio-data.json"
+      ]
+    }
+  }
+}

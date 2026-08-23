@@ -1,0 +1,32 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/telegeography/cables",
+      "destination": "https://www.submarinecablemap.com/api/v3/cable/cable-geo.json"
+    },
+    {
+      "source": "/api/telegeography/cable/:id",
+      "destination": "https://www.submarinecablemap.com/api/v3/cable/:id.json"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/telegeography/cables",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=7200, stale-while-revalidate=86400"
+        }
+      ]
+    },
+    {
+      "source": "/api/telegeography/cable/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=86400, stale-while-revalidate=604800"
+        }
+      ]
+    }
+  ]
+}
