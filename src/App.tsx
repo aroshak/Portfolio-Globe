@@ -75,7 +75,11 @@ function HomePage() {
         />
         <Timeline
           entries={activeEntries}
-          onFlyTo={(e) => setFlyTarget({ lat: e.lat, lng: e.lng, id: e.id + Date.now() })}
+          onFlyTo={(e) => {
+            setSelected(e.entry);
+            setSelectedCable(null);
+            setFlyTarget({ lat: e.lat, lng: e.lng, id: e.id + "-" + Date.now() });
+          }}
         />
       </section>
 

@@ -222,7 +222,7 @@ export function GlobeHero({
   useEffect(() => {
     const g = globeRef.current;
     if (!g || !flyTarget) return;
-    g.pointOfView({ lat: flyTarget.lat, lng: flyTarget.lng, altitude: 1.4 }, 1800);
+    g.pointOfView({ lat: flyTarget.lat, lng: flyTarget.lng, altitude: 1.05 }, 2000);
   }, [flyTarget]);
 
   // Marine infrastructure is densest around the North Sea. Focus that region
@@ -247,11 +247,12 @@ export function GlobeHero({
   };
   const pointsData = useMemo(() => {
     const cv = activeEntries.map((e) => ({
+      id: e.id,
       lat: e.location.lat,
       lng: e.location.lng,
-      alt: 0.012,
-      r: 0.024,
-      color: TAB_COLOR[e.tab] ?? "#4adede",
+      alt: selected?.id === e.id ? 0.035 : 0.012,
+      r: selected?.id === e.id ? 0.085 : 0.024,
+      color: selected?.id === e.id ? "#ffffff" : TAB_COLOR[e.tab] ?? "#4adede",
       label: tip(e.org, `${e.title} · ${e.period}`, TAB_COLOR[e.tab] ?? "#4adede"),
     }));
     const marinePts = active.has("marine")
@@ -298,7 +299,7 @@ export function GlobeHero({
         }))
       : [];
     return [...cv, ...marinePts, ...satPts, ...threatPts];
-  }, [activeEntries, active, marine, sats, threats]);
+  }, [activeEntries, active, marine, sats, threats, selected?.id]);
 
   // Always show floating labels for all active entries.
   // Entries sharing the same coordinates (e.g. several Colombo roles) are

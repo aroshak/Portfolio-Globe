@@ -10,6 +10,7 @@ interface TimelineEntry {
   period: string;
   lat: number;
   lng: number;
+  entry: any;
 }
 
 interface TimelineProps {
@@ -42,6 +43,7 @@ function buildTimeline(entries: any[]): TimelineEntry[] {
         period: e.period || "",
         lat: e.location.lat,
         lng: e.location.lng,
+        entry: e,
       };
     })
     .filter((e) => e.year)
