@@ -4,13 +4,14 @@ import {
   Briefcase, Award, Droplet, X, ExternalLink, MapPin,
   Star, ChevronLeft, ChevronRight, Calendar,
   Wrench, FolderKanban, FileText, Crosshair, Cpu, Activity,
-  Trophy, BookOpen, Info,
+  Trophy, BookOpen, Info, ArrowUpRight, Mail, Radio,
 } from "lucide-react";
 import type { CableMeta, CablePath, LayerId } from "../hooks/useLayers";
 import { LAYER_GROUPS } from "../hooks/useLayers";
 import { CableInfoPanel } from "./CableInfoPanel";
 import { getEnrichedEntry, type EnrichedEntry } from "../data/enriched-entries";
 import { fetchPlaceInfo, type PlaceInfo } from "../lib/places";
+import { githubProfile } from "../data/github-repos";
 
 const TAB_COLOR: Record<string, string> = {
   education: "#4adede",
@@ -138,33 +139,25 @@ export function Dashboard({ active, onToggle, selected, onSelect, entries, overl
   /* ── Shared HUD ── */
   const hud = (
     <>
-      <header className="absolute top-0 left-0 right-0 flex items-center justify-between px-6 py-4 pointer-events-auto z-30">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl glass-dark flex items-center justify-center relative overflow-hidden glare-sweep">
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-cyan-glow/15 to-transparent" />
-            <Shield size={17} className="text-cyan-glow relative z-10" strokeWidth={1.5} />
-          </div>
-          <div className="leading-tight">
-            <div className="text-sm font-medium tracking-[0.2em] text-text-primary">
-              AROSHA<span className="text-cyan-glow">.NET</span>
-            </div>
-            <div className="text-[9px] tracking-[0.18em] uppercase text-text-muted">Network Operations Command</div>
-          </div>
+      <header className="hero-command-header pointer-events-auto">
+        <a className="hero-brand" href="https://arosha.au" aria-label="Arosha Kaluarachchi home">
+          <span className="hero-avatar-wrap"><img src={githubProfile.avatar} alt="Arosha Kaluarachchi"/><i /></span>
+          <span className="hero-identity"><b>Arosha Kaluarachchi</b><small>Senior Network Engineer · AI & Automation</small></span>
+          <span className="hero-domain">arosha<span>.au</span><ArrowUpRight size={11}/></span>
+        </a>
+
+        <div className="hero-focus" aria-label="Areas of expertise">
+          <span><Radio size={11}/> Agentic delivery</span>
+          <i />
+          <span><Activity size={11}/> Infrastructure automation</span>
+          <i />
+          <span><Shield size={11}/> Production safety</span>
         </div>
-        <div className="hidden sm:flex items-center gap-3">
-          <div className="glass-dark rounded-full px-3 py-1.5 flex items-center gap-2">
-            <Activity size={10} className="text-cyan-glow" />
-            <span className="text-[9px] font-mono text-text-secondary tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-glow shadow-[0_0_8px_#4adede] animate-pulse inline-block mr-1.5" />
-              SYS_ONLINE
-            </span>
-          </div>
-          <div className="glass-dark rounded-full px-3 py-1.5">
-            <span className="text-[9px] font-mono text-text-muted tracking-wider flex items-center gap-1.5">
-              <Crosshair size={9} className="text-text-muted" />
-              MELBOURNE, AU
-            </span>
-          </div>
+
+        <div className="hero-actions">
+          <span className="hero-location"><Crosshair size={10}/> Melbourne, AU</span>
+          <span className="hero-availability"><i/> Open to conversations</span>
+          <a href="mailto:aroshak@gmail.com" className="hero-contact"><Mail size={13}/><span>Contact</span></a>
         </div>
       </header>
 
