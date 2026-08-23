@@ -188,6 +188,8 @@ export function GlobeHero({
   const sats = useSatellites(active.has("satellites"));
   const introDone = useRef(false);
   const marineFocused = useRef(false);
+  const introTimers = useRef<number[]>([]);
+  const flightTimer = useRef<number | null>(null);
 
   // Responsive sizing
   useEffect(() => {
@@ -206,23 +208,41 @@ export function GlobeHero({
     const g = globeRef.current;
     if (!g) return;
     g.pointOfView({ lat: 12, lng: 80, altitude: 3.2 }, 0);
-    const t = setTimeout(() => {
+    const t = window.setTimeout(() => {
       g.pointOfView({ lat: home.lat, lng: home.lng, altitude: 2.2 }, 2200);
       // After intro completes, stop auto-rotate
-      setTimeout(() => {
+      const inner = window.setTimeout(() => {
         introDone.current = true;
         const controls = g.controls() as any;
         if (controls) controls.autoRotate = false;
       }, 2500);
+      introTimers.current.push(inner);
     }, 600);
-    return () => clearTimeout(t);
+    introTimers.current.push(t);
+    return () => { introTimers.current.forEach(window.clearTimeout); introTimers.current = []; };
   }, [home.lat, home.lng]);
 
   // Fly-to from timeline
   useEffect(() => {
     const g = globeRef.current;
     if (!g || !flyTarget) return;
-    g.pointOfView({ lat: flyTarget.lat, lng: flyTarget.lng, altitude: 1.05 }, 2000);
+    introTimers.current.forEach(window.clearTimeout);
+    introTimers.current = [];
+    introDone.current = true;
+    const controls = g.controls() as any;
+    if (controls) {
+      controls.autoRotate = false;
+      controls.enabled = false;
+    }
+    if (flightTimer.current !== null) window.clearTimeout(flightTimer.current);
+    // First travel above the destination so long-distance moves are obvious,
+    // then descend to the selected pin for the detail view.
+    g.pointOfView({ lat: flyTarget.lat, lng: flyTarget.lng, altitude: 1.9 }, 850);
+    flightTimer.current = window.setTimeout(() => {
+      g.pointOfView({ lat: flyTarget.lat, lng: flyTarget.lng, altitude: 0.72 }, 1150);
+      window.setTimeout(() => { if (controls) controls.enabled = true; }, 1200);
+    }, 875);
+    return () => { if (flightTimer.current !== null) window.clearTimeout(flightTimer.current); };
   }, [flyTarget]);
 
   // Marine infrastructure is densest around the North Sea. Focus that region
@@ -250,8 +270,8 @@ export function GlobeHero({
       id: e.id,
       lat: e.location.lat,
       lng: e.location.lng,
-      alt: selected?.id === e.id ? 0.035 : 0.012,
-      r: selected?.id === e.id ? 0.085 : 0.024,
+      alt: selected?.id === e.id ? 0.07 : 0.012,
+      r: selected?.id === e.id ? 0.34 : 0.024,
       color: selected?.id === e.id ? "#ffffff" : TAB_COLOR[e.tab] ?? "#4adede",
       label: tip(e.org, `${e.title} · ${e.period}`, TAB_COLOR[e.tab] ?? "#4adede"),
     }));
@@ -332,6 +352,15 @@ export function GlobeHero({
     () => (active.has("threats") ? threats : []),
     [threats, active]
   );
+  const visibleRings = useMemo(() => [
+    ...threatRings.map((ring) => ({ ...ring, kind: "threat" as const })),
+    ...(selected?.location ? [{
+      lat: selected.location.lat,
+      lng: selected.location.lng,
+      kind: "selection" as const,
+      family: "",
+    }] : []),
+  ], [threatRings, selected]);
 
   return (
     <div ref={containerRef} className="absolute inset-0">
@@ -392,16 +421,17 @@ export function GlobeHero({
         pathDashGap={0.008}
         pathDashAnimateTime={12000}
         // Threat intel — pulsing rings coloured per botnet family
-        ringsData={threatRings}
+        ringsData={visibleRings}
         ringLat="lat"
         ringLng="lng"
         ringColor={(r: any) => {
+          if (r.kind === "selection") return (t: number) => `rgba(255,255,255,${1 - t})`;
           const c = threatColor((r as ThreatRing).family);
           return (t: number) => hexToRgba(c, 1 - t);
         }}
-        ringMaxRadius={4}
-        ringPropagationSpeed={2}
-        ringRepeatPeriod={900}
+        ringMaxRadius={(r: any) => r.kind === "selection" ? 2.4 : 4}
+        ringPropagationSpeed={(r: any) => r.kind === "selection" ? 1.25 : 2}
+        ringRepeatPeriod={(r: any) => r.kind === "selection" ? 650 : 900}
       />
     </div>
   );
