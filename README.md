@@ -8,7 +8,8 @@ This repository can be reused as a template. Most personal content is stored in 
 
 - Interactive Three.js globe with career and education locations
 - Education, experience, certification, infrastructure, and live-data layers
-- 3D GitHub repository carousel with project-detail panels
+- Dynamic GitHub repository discovery through GitHub's public API
+- 3D GitHub repository carousel with project-detail and usage panels
 - Detailed Markdown case-study reader with a generated table of contents
 - Career, capabilities, products, LinkedIn, résumé, and contact sections
 - Separate “About this build” page
@@ -202,7 +203,40 @@ If you use cities not currently listed in the fallback map, add them to the `cit
 
 When adding an entry such as `work-2024-example`, search that file for the existing ID maps and add the same ID where appropriate.
 
-## Update GitHub projects
+## Dynamic GitHub projects
+
+The repository carousel is dynamic. On page load, the application requests public repositories from:
+
+```text
+https://api.github.com/users/aroshak/repos?per_page=100&sort=updated
+```
+
+The loader is implemented by `loadGitHubRepos()` in [`src/data/github-repos.ts`](src/data/github-repos.ts).
+
+Its behaviour is:
+
+1. Read a valid repository response from browser `localStorage`, when available.
+2. Refresh public repositories from GitHub every 15 minutes.
+3. Exclude repositories that are forks.
+4. Merge live GitHub metadata with locally curated portfolio descriptions.
+5. Append curated projects that are temporarily missing from the API response.
+6. Fall back to the complete local project list when GitHub is unavailable, rate-limited, or blocked.
+
+Live values from GitHub include:
+
+- Repository URL
+- Primary language
+- Stars and forks
+- Licence metadata
+- Creation and update dates
+- Public topics
+- Archive status
+
+This means newly created public repositories appear automatically. They receive a generic but usable project panel until you add a curated entry.
+
+GitHub's unauthenticated API is intentionally used so no secret token is shipped to the browser. It has a lower rate limit than authenticated requests, which is why the application caches results and always keeps a local fallback.
+
+## Curate important GitHub projects
 
 Repository cards are defined in [`src/data/github-repos.ts`](src/data/github-repos.ts).
 
@@ -256,7 +290,65 @@ Then add one object per repository:
 
 The `usage` steps appear in the project-detail panel when someone selects a Three.js card.
 
-The Three.js carousel implementation is in [`src/components/GitRepoScroller.tsx`](src/components/GitRepoScroller.tsx). Normally you should update its data rather than editing its rendering code.
+The merger matches API repositories to curated entries by repository name, case-insensitively. Keep the curated `name` identical to the actual GitHub repository name. For example:
+
+```ts
+name: "Portfolio-Globe"
+```
+
+When a match exists, GitHub supplies the changing metadata while the local entry supplies the carefully written:
+
+- Summary
+- Capabilities and outcomes
+- Usage instructions
+- Technology stack
+- Category and accent colour
+- Featured status
+
+Uncurated repositories are still displayed. Their detail panels direct visitors to the repository README for project-specific setup information.
+
+The Three.js carousel implementation is in [`src/components/GitRepoScroller.tsx`](src/components/GitRepoScroller.tsx). It rebuilds its 3D cards after dynamic GitHub data arrives. Normally you should update the curated data rather than editing its rendering code.
+
+### Change the GitHub account used for automatic discovery
+
+Update both `githubProfile` and the API URL inside `loadGitHubRepos()`:
+
+```ts
+const response = await fetch(
+  "https://api.github.com/users/YOUR_ACCOUNT/repos?per_page=100&sort=updated"
+);
+```
+
+Also change the cache key when publishing a fork for another person:
+
+```ts
+const repoCacheKey = "your_name_github_repos_v1";
+```
+
+Changing the cache key prevents a browser from briefly displaying repository data cached for the previous portfolio owner.
+
+### Force an immediate GitHub refresh
+
+Repository data normally refreshes after 15 minutes. During development, remove the cache from the browser console:
+
+```js
+localStorage.removeItem("portfolio_github_repos_v1")
+location.reload()
+```
+
+## Portfolio Globe as a project
+
+This repository is included in its own project system as `Portfolio-Globe`. Its curated card explains:
+
+- The interactive career globe
+- Dynamic GitHub discovery
+- The 3D project carousel
+- Markdown case-study rendering
+- How other professionals can reuse the portfolio
+
+Keep that entry in `src/data/github-repos.ts` if you want your fork to demonstrate its own implementation. Rename it and update its repository URL when your fork uses a different GitHub project name.
+
+The `/build` page also contains an “Open source / reusable” panel that links to the repository and this README. Update that URL in [`src/components/BuildPage.tsx`](src/components/BuildPage.tsx) when reusing the project.
 
 ## Update products
 
@@ -376,6 +468,8 @@ The included [`vercel.json`](vercel.json) configures SPA rewrites and API behavi
 
 - Replace every name, email address, social link, and product URL.
 - Replace the GitHub avatar and repository data.
+- Change the dynamic GitHub API username and browser cache key.
+- Update the `/build` repository link to point to your fork.
 - Replace the résumé.
 - Remove case studies you do not own.
 - Check every location and timeline date.
@@ -383,6 +477,7 @@ The included [`vercel.json`](vercel.json) configures SPA rewrites and API behavi
 - Search the repository for the original owner’s name and email.
 - Run `npm run build`.
 - Test the globe, repository carousel, modals, case-study routes, external links, and mobile layout.
+- Test both a successful GitHub API response and the curated offline fallback.
 - Confirm `.env` remains ignored by Git.
 
 Useful final checks:
