@@ -35,7 +35,7 @@ test("side panel: entity search + photo + organized UI", async ({ page }) => {
 
   // The verified panel uses a portfolio-owned system visual instead of an
   // unverified third-party entity photo. Assert the identity and detail areas.
-  await expect(hero.getByText("PORTFOLIO RECORD", { exact: true })).toBeVisible();
+  await expect(hero.getByText("PORTFOLIO RECORD", { exact: true }).first()).toBeVisible();
   await expect(hero.getByText("Study breakdown", { exact: true })).toBeVisible();
   await expect(hero.getByText("Learning & capability", { exact: true })).toBeVisible();
 
