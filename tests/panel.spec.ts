@@ -12,12 +12,11 @@ test("side panel: entity search + photo + organized UI", async ({ page }) => {
   await page.goto("http://localhost:5100/", { waitUntil: "networkidle", timeout: 40000 });
   await page.waitForTimeout(4000); // intro fly-in
 
-  // Find the collapsed globe label for Colombo (education is default-on)
-  const colomboLabel = page.locator(".globe-hover-card", { hasText: "Colombo" }).first();
-  await colomboLabel.waitFor({ state: "attached", timeout: 10000 });
-
-  // Click the collapsed label → opens side panel
-  await colomboLabel.click({ force: true });
+  // Use the always-accessible timeline control. Globe HTML labels depend on
+  // camera projection and are intentionally culled when behind the globe.
+  const colomboTimelineItem = page.locator('button[data-opens-panel="true"][title*="Colombo"]').first();
+  await colomboTimelineItem.waitFor({ state: "visible", timeout: 10000 });
+  await colomboTimelineItem.click();
   await page.waitForTimeout(4500); // let Places JS API load + search
 
   // ── Panel assertions ──

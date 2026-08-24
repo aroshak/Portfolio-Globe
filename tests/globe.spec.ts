@@ -12,8 +12,9 @@ test("globe renders without console errors", async ({ page }) => {
   await page.goto("http://localhost:5100/", { waitUntil: "networkidle", timeout: 30000 });
   await page.waitForTimeout(3000);
 
-  // Check the globe canvas exists
-  const canvas = page.locator("canvas");
+  // The page now includes several intentional Three.js canvases. Scope this
+  // assertion to the globe scene rather than counting every WebGL surface.
+  const canvas = page.locator(".globe-scene-layer canvas");
   await expect(canvas).toHaveCount(1, { timeout: 5000 });
 
   // Check dashboard chrome rendered
