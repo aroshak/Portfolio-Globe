@@ -478,6 +478,8 @@ curl http://127.0.0.1:5100/healthz
 
 The container includes a health check and runs independently of other applications on the host. Production uses the container name `portfolio-globe` and publishes it on host port `5100`; an existing reverse proxy can route a dedicated domain to `127.0.0.1:5100`.
 
+Nginx compresses and caches the large cable GeoJSON response and gives the upstream enough time to complete on a cold cache. The deployment gate warms that cache and validates that at least 700 TeleGeography cable features are available from the newly started container before the workflow reports success.
+
 ### Automated delivery
 
 The [`deploy-vps.yml`](.github/workflows/deploy-vps.yml) workflow runs on every push to `main`:

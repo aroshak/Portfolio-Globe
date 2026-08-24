@@ -154,7 +154,10 @@ async function fetchCableGeoJson(url: string, timeoutMs: number) {
 async function loadCables(): Promise<CableLoadResult> {
   if (_cablesCache) return _cablesCache;
   try {
-    const geo = await fetchCableGeoJson(CABLE_API_URL, 10000);
+    // The full global cable GeoJSON is ~740 KB uncompressed. Production VPS
+    // links can legitimately take longer than a local Vite proxy, especially
+    // on the first uncached request, so allow the body to finish streaming.
+    const geo = await fetchCableGeoJson(CABLE_API_URL, 60000);
     _cablesCache = {
       paths: parseCableGeoJson(geo),
       meta: {
@@ -166,7 +169,7 @@ async function loadCables(): Promise<CableLoadResult> {
     };
   } catch (liveError) {
     try {
-      const geo = await fetchCableGeoJson(CABLE_SNAPSHOT_URL, 5000);
+      const geo = await fetchCableGeoJson(CABLE_SNAPSHOT_URL, 30000);
       _cablesCache = {
         paths: parseCableGeoJson(geo),
         meta: {
