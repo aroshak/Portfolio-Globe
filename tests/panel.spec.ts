@@ -33,20 +33,11 @@ test("side panel: entity search + photo + organized UI", async ({ page }) => {
   // Briefing section
   await expect(hero.getByText("Record summary", { exact: true })).toBeVisible();
 
-  // Check photo loaded in hero (img with naturalWidth > 0)
-  const heroImg = page.locator("aside.right-4.top-16 img").first();
-  const imgCount = await page.locator("aside.right-4.top-16 img").count();
-  console.log("IMG COUNT in panel:", imgCount);
-  expect(imgCount, "a selected place should resolve a Google or Wikimedia image").toBeGreaterThan(0);
-  const natural = await heroImg.evaluate((i: HTMLImageElement) => i.naturalWidth);
-  console.log("IMG naturalWidth:", natural);
-  expect(natural).toBeGreaterThan(0);
-  const src = await heroImg.getAttribute("src");
-  console.log("IMG src prefix:", src?.slice(0, 80));
-
-  // Entity intel — check if address row appeared (Places returned data)
-  const addrVisible = await page.getByText("ADDR").isVisible().catch(() => false);
-  console.log("ADDR row visible:", addrVisible);
+  // The verified panel uses a portfolio-owned system visual instead of an
+  // unverified third-party entity photo. Assert the identity and detail areas.
+  await expect(hero.getByText("PORTFOLIO RECORD", { exact: true })).toBeVisible();
+  await expect(hero.getByText("Study breakdown", { exact: true })).toBeVisible();
+  await expect(hero.getByText("Learning & capability", { exact: true })).toBeVisible();
 
   console.log("=== ERRORS ===");
   errors.forEach((e) => console.log(e));
