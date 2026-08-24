@@ -1,13 +1,15 @@
 // ── Behind the Build — multi-agent workflow + open-source models ──
+import { useState } from "react";
 import {
   Network, ScanSearch, Globe, Hammer, Eye, Brain,
-  Cpu, Bot, Code2, Database, ChevronRight, GitBranch,
+  Cpu, Bot, Code2, Database, ChevronRight, GitBranch, History, Workflow,
 } from "lucide-react";
 import {
   buildHeadline, pipelineStages, agentRoster, openStack, buildStats, buildClosing,
 } from "../data/build-story";
 import { Reveal, TiltCard, CountUp } from "./motion";
 import { DeploymentCanvas } from "./DeploymentCanvas";
+import { GitHubActionsPanel } from "./GitHubActionsPanel";
 
 const AGENT_ICONS: Record<string, any> = {
   orchestrator: Network,
@@ -26,6 +28,8 @@ const STACK_ICONS: Record<string, any> = {
 };
 
 export function BuildStory() {
+  const [buildView, setBuildView] = useState<"architecture" | "deployments">("architecture");
+
   return (
     <section id="build-story" className="relative w-full px-6 py-20 md:px-12">
       <div className="mx-auto max-w-6xl">
@@ -62,7 +66,18 @@ export function BuildStory() {
           ))}
         </div>
 
-        <DeploymentCanvas />
+        <div className="build-view-tabs" role="tablist" aria-label="Build system views">
+          <button type="button" role="tab" aria-selected={buildView === "architecture"} onClick={() => setBuildView("architecture")}>
+            <Workflow size={14}/> BUILD ARCHITECTURE
+          </button>
+          <button type="button" role="tab" aria-selected={buildView === "deployments"} onClick={() => setBuildView("deployments")}>
+            <History size={14}/> ACTIONS &amp; DEPLOYMENTS
+          </button>
+          <span>LIVE BUILD EVIDENCE</span>
+        </div>
+        <div role="tabpanel" className="build-view-panel">
+          {buildView === "architecture" ? <DeploymentCanvas /> : <GitHubActionsPanel />}
+        </div>
 
         {/* ── PIPELINE ── */}
         <Reveal from="left" className="mb-6">
