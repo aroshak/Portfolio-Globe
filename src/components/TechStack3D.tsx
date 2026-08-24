@@ -1,5 +1,31 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import {
+  siAnsible, siAnthropic, siCisco, siCitrix, siDocker, siF5, siFortinet,
+  siGithub, siGithubactions, siGooglecloud, siJunipernetworks, siKubernetes,
+  siLangchain, siModelcontextprotocol, siN8n, siNeo4j, siNextdotjs, siNginx,
+  siNodedotjs, siPaloaltonetworks, siReact, siSupabase, siTerraform,
+  siTypescript, siPython, siWireguard, type SimpleIcon,
+} from "simple-icons";
+
+const ICONS: Record<string, SimpleIcon> = {
+  ansible: siAnsible, anthropic: siAnthropic, cisco: siCisco, citrix: siCitrix,
+  docker: siDocker, f5: siF5, fortinet: siFortinet, github: siGithub,
+  githubactions: siGithubactions, googlecloud: siGooglecloud,
+  junipernetworks: siJunipernetworks, kubernetes: siKubernetes,
+  langchain: siLangchain, modelcontextprotocol: siModelcontextprotocol, n8n: siN8n,
+  neo4j: siNeo4j, nextdotjs: siNextdotjs, nginx: siNginx,
+  nodedotjs: siNodedotjs, paloaltonetworks: siPaloaltonetworks, python: siPython,
+  react: siReact, supabase: siSupabase, terraform: siTerraform,
+  typescript: siTypescript, wireguard: siWireguard,
+};
+
+function bundledLogoUrl(slug: string): string | undefined {
+  const icon = ICONS[slug];
+  if (!icon) return undefined;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#4adede" d="${icon.path}"/></svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
 
 type TechItem = readonly [name: string, iconSlug: string, category: string, officialLogoUrl?: string];
 const TECH: readonly TechItem[] = [
@@ -53,10 +79,11 @@ function cardTexture(renderer: THREE.WebGLRenderer, name: string, slug: string, 
   draw();
   const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-  if (slug || officialLogoUrl) {
+  const logoSource = officialLogoUrl || bundledLogoUrl(slug);
+  if (logoSource) {
     const image = new Image(); image.crossOrigin = "anonymous";
     image.onload = () => { draw(image); texture.needsUpdate = true; };
-    image.src = officialLogoUrl || `https://cdn.simpleicons.org/${slug}/4adede`;
+    image.src = logoSource;
   }
   return texture;
 }

@@ -25,12 +25,13 @@ test("side panel: entity search + photo + organized UI", async ({ page }) => {
   // Scope duplicated labels to the open information panel.
   await expect(hero.getByText("EDUCATION", { exact: true })).toBeVisible();
 
-  // Stats row present (Entity Type / Since)
-  await expect(page.getByText("ENTITY TYPE")).toBeVisible();
-  await expect(page.getByText("SINCE")).toBeVisible();
+  // Current dashboard metrics and structured information sections.
+  await expect(hero.getByText("Study items", { exact: true })).toBeVisible();
+  await expect(hero.getByText("Capabilities", { exact: true })).toBeVisible();
+  await expect(hero.getByText("Outcomes", { exact: true })).toBeVisible();
 
   // Briefing section
-  await expect(page.getByText("BRIEFING")).toBeVisible();
+  await expect(hero.getByText("Record summary", { exact: true })).toBeVisible();
 
   // Check photo loaded in hero (img with naturalWidth > 0)
   const heroImg = page.locator("aside.right-4.top-16 img").first();
