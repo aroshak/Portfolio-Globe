@@ -66,6 +66,7 @@ export function Timeline({ entries, onFlyTo }: TimelineProps) {
         {timeline.map((e, i) => (
           <div key={e.id} className="flex items-center">
             <button
+              data-opens-panel="true"
               onClick={() => { setActive(e.id); onFlyTo(e); }}
               title={`${e.label} — ${e.period} (${e.location})`}
               className={`flex flex-col items-center px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${active === e.id ? "bg-cyan-glow/15 border border-cyan-glow/40" : "hover:bg-white/5 border border-transparent"}`}

@@ -2,6 +2,7 @@
 import {
   useEffect, useRef, useState, type ReactNode, type CSSProperties,
 } from "react";
+import * as THREE from "three";
 
 /* ── Reveal: fade + rise + de-blur on first viewport entry ── */
 export function Reveal({
@@ -195,4 +196,43 @@ export function SectionSep() {
       </div>
     </div>
   );
+}
+
+/* Page-wide cascade + Three.js scan wave for section entry. */
+export function PageCascadeFX() {
+  const mountRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const mount = mountRef.current;
+    if (!mount) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const sections = [...document.querySelectorAll<HTMLElement>("main > section:not(.globe-floating), main > section:not(.globe-floating) section")];
+    sections.forEach((section) => [...section.children].forEach((child, index) => {
+      if (!(child instanceof HTMLElement)) return;
+      child.classList.add("page-cascade-item");
+      child.style.setProperty("--cascade-index", String(Math.min(index, 8)));
+    }));
+    if (reduced) { sections.forEach((section) => section.classList.add("page-cascade-visible")); return; }
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, .1, 10); camera.position.z = 2;
+    const renderer = new THREE.WebGLRenderer({ alpha:true, antialias:true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5)); renderer.setSize(innerWidth, innerHeight); mount.appendChild(renderer.domElement);
+    const lineMaterial = new THREE.MeshBasicMaterial({ color:0x4adede, transparent:true, opacity:0, blending:THREE.AdditiveBlending });
+    const line = new THREE.Mesh(new THREE.PlaneGeometry(2, .006), lineMaterial); scene.add(line);
+    const count = 90, positions = new Float32Array(count * 3), velocities = new Float32Array(count * 2);
+    for (let i=0;i<count;i++){positions[i*3]=(Math.random()-.5)*2;positions[i*3+1]=0;velocities[i*2]=(Math.random()-.5)*.002;velocities[i*2+1]=(Math.random()-.5)*.004;}
+    const geometry = new THREE.BufferGeometry(); geometry.setAttribute("position",new THREE.BufferAttribute(positions,3));
+    const material = new THREE.PointsMaterial({color:0x4adede,size:.012,transparent:true,opacity:0,blending:THREE.AdditiveBlending});
+    const particles = new THREE.Points(geometry,material); scene.add(particles);
+    let energy=0, frame=0;
+    const trigger=(screenY:number)=>{const y=1-(screenY/innerHeight)*2;line.position.y=y;particles.position.y=y;energy=1;};
+    const io = new IntersectionObserver((entries)=>entries.forEach((entry)=>{if(!entry.isIntersecting)return;const section=entry.target as HTMLElement;section.classList.add("page-cascade-visible");trigger(Math.max(80,Math.min(innerHeight-80,entry.boundingClientRect.top+80)));io.unobserve(section);}),{threshold:.08,rootMargin:"0px 0px -7% 0px"});
+    sections.forEach((section)=>io.observe(section));
+    const resize=()=>renderer.setSize(innerWidth,innerHeight);window.addEventListener("resize",resize);
+    const tick=()=>{energy*=.94;lineMaterial.opacity=energy*.52;material.opacity=energy*.7;line.scale.x=1+(1-energy)*.25;const pos=geometry.attributes.position.array as Float32Array;for(let i=0;i<count;i++){pos[i*3]+=velocities[i*2];pos[i*3+1]+=velocities[i*2+1];if(Math.abs(pos[i*3])>1)pos[i*3]*=-1;}geometry.attributes.position.needsUpdate=true;renderer.render(scene,camera);frame=requestAnimationFrame(tick);};tick();
+    return()=>{io.disconnect();cancelAnimationFrame(frame);window.removeEventListener("resize",resize);geometry.dispose();material.dispose();line.geometry.dispose();lineMaterial.dispose();renderer.dispose();renderer.domElement.remove();};
+  }, []);
+
+  return <div ref={mountRef} className="page-cascade-fx" aria-hidden="true" />;
 }

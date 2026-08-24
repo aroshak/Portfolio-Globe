@@ -1,11 +1,13 @@
 import {
-  ArrowRight, Bot, Boxes, CheckCircle2, CloudCog, Code2, Download,
+  ArrowRight, Bot, Boxes, CloudCog, Code2, Download,
   ExternalLink, Globe, MessageCircle, Network, ShieldCheck, Sparkles,
 } from "lucide-react";
 import data from "../data/portfolio-data.json";
 import { Reveal } from "./motion";
 import { GitRepoScroller } from "./GitRepoScroller";
 import { githubProfile } from "../data/github-repos";
+import { TechStack3D } from "./TechStack3D";
+import { CapabilityShowcase3D, SelectedSystems3D } from "./CapabilitySystems3D";
 
 const capabilities = [
   {
@@ -78,7 +80,7 @@ const links = data.person.links;
 export function PortfolioLanding() {
   return (
     <>
-      <nav className="portfolio-nav" aria-label="Portfolio navigation">
+      <nav id="portfolio-start" className="portfolio-nav" aria-label="Portfolio navigation">
         <a href="#top" className="nav-brand"><img src={githubProfile.avatar} alt="Arosha Kaluarachchi"/><strong>Arosha Kaluarachchi</strong></a>
         <div className="nav-links">
           <a href="#work">Work</a><a href="#career">Career</a><a href="/build">About this build</a>
@@ -111,19 +113,11 @@ export function PortfolioLanding() {
         </div>
       </section>
 
-      <section className="page-shell section-block">
-        <Reveal from="up"><div className="section-heading"><div><div className="section-kicker">[ HOW I CAN HELP ]</div><h2>From operational problem<br />to dependable system.</h2></div><p>I work across the boundary most teams struggle to bridge: infrastructure expertise, software delivery and practical AI.</p></div></Reveal>
-        <div className="capability-grid">
-          {capabilities.map(({icon: Icon, title, body, proof}, i) => <Reveal key={title} delay={i*80} from="up"><article className="capability"><Icon size={22}/><h3>{title}</h3><p>{body}</p><span>{proof}</span></article></Reveal>)}
-        </div>
-      </section>
+      <TechStack3D />
 
-      <section id="work" className="page-shell section-block">
-        <Reveal from="up"><div className="section-heading"><div><div className="section-kicker">[ SELECTED SYSTEMS ]</div><h2>Complex change,<br />made repeatable.</h2></div><p>Three examples of turning high-risk infrastructure work into observable, reviewable automation.</p></div></Reveal>
-        <div className="case-list">
-          {cases.map((c, i) => <Reveal key={c.n} delay={i*80} from="up"><article className="case-study"><div className="case-index">{c.n}</div><div className="case-main"><span className="case-context">{c.context}</span><h3>{c.title}</h3><p>{c.outcome}</p><a href={c.href}>Read the case study <ArrowRight size={14}/></a></div><div className="case-proof"><span>{c.stack}</span>{c.proof.map(p=><div key={p}><CheckCircle2 size={14}/>{p}</div>)}</div></article></Reveal>)}
-        </div>
-      </section>
+      <CapabilityShowcase3D capabilities={capabilities} />
+
+      <SelectedSystems3D cases={cases} />
 
       <section id="career" className="page-shell section-block">
         <Reveal from="up"><div className="section-heading"><div><div className="section-kicker">[ CAREER FOUNDATION ]</div><h2>Built across industries,<br />countries and layers.</h2></div><p>From radio and ISP backbones to banking, national infrastructure, multi-cloud platforms and AI products.</p></div></Reveal>

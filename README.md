@@ -464,6 +464,41 @@ The application uses a lightweight pathname switch in [`src/App.tsx`](src/App.ts
 
 The included [`vercel.json`](vercel.json) configures SPA rewrites and API behaviour for Vercel deployment.
 
+## Docker and VPS deployment
+
+The portfolio ships as a multi-stage Docker image. Node builds the Vite application, then Nginx serves the static production bundle, handles SPA route fallbacks and proxies the TeleGeography submarine-cable endpoints that otherwise lack browser CORS headers.
+
+Build and run it locally:
+
+```bash
+docker build -t portfolio-globe .
+docker run --rm --name portfolio-globe -p 5100:80 portfolio-globe
+curl http://127.0.0.1:5100/healthz
+```
+
+The container includes a health check and runs independently of other applications on the host. Production uses the container name `portfolio-globe` and publishes it on host port `5100`; an existing reverse proxy can route a dedicated domain to `127.0.0.1:5100`.
+
+### Automated delivery
+
+The [`deploy-vps.yml`](.github/workflows/deploy-vps.yml) workflow runs on every push to `main`:
+
+1. Install locked dependencies with Node 20.
+2. Typecheck and create the production Vite build.
+3. Install Chromium and run the Playwright browser suite.
+4. Build a versioned Docker image and publish it to GitHub Container Registry.
+5. Connect to the VPS, replace only the `portfolio-globe` container and verify `/healthz` before declaring success.
+
+Configure these GitHub Actions secrets in the repository or its `production` environment:
+
+| Secret | Purpose |
+| --- | --- |
+| `VPS_HOST` | VPS hostname or IP address |
+| `VPS_PORT` | SSH port, normally `22` |
+| `VPS_USERNAME` | SSH account permitted to run Docker |
+| `VPS_PASSWORD` | SSH password; prefer replacing this with a deploy key later |
+
+The deployment uses the workflow-scoped `GITHUB_TOKEN` for GHCR authentication. No VPS credential, registry token or private environment value belongs in the repository.
+
 ## Before publishing your version
 
 - Replace every name, email address, social link, and product URL.

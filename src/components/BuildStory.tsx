@@ -7,6 +7,7 @@ import {
   buildHeadline, pipelineStages, agentRoster, openStack, buildStats, buildClosing,
 } from "../data/build-story";
 import { Reveal, TiltCard, CountUp } from "./motion";
+import { DeploymentCanvas } from "./DeploymentCanvas";
 
 const AGENT_ICONS: Record<string, any> = {
   orchestrator: Network,
@@ -60,6 +61,8 @@ export function BuildStory() {
             </Reveal>
           ))}
         </div>
+
+        <DeploymentCanvas />
 
         {/* ── PIPELINE ── */}
         <Reveal from="left" className="mb-6">

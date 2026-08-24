@@ -194,6 +194,9 @@ export interface ThreatRing {
   ip: string;
   family: string;
   country: string;
+  reports?: number;
+  targets?: number;
+  provider?: string;
 }
 
 // Geolocate a batch of IPs via ipwho.is with limited concurrency
@@ -221,8 +224,8 @@ let _threatPromise: Promise<ThreatRing[]> | null = null;
 async function loadThreats(): Promise<ThreatRing[]> {
   if (_threatPromise) return _threatPromise;
   _threatPromise = (async () => {
-    const cacheKey = "threats_geo_v3";
-    const cacheTsKey = "threats_geo_ts_v3";
+    const cacheKey = "threats_geo_v4";
+    const cacheTsKey = "threats_geo_ts_v4";
     const maxAge = 1000 * 60 * 60; // 1h
     const cached = localStorage.getItem(cacheKey);
     const ts = Number(localStorage.getItem(cacheTsKey) || 0);
@@ -233,16 +236,31 @@ async function loadThreats(): Promise<ThreatRing[]> {
         /* ignore */
       }
     }
-    const r = await fetch("https://feodotracker.abuse.ch/downloads/ipblocklist.json");
-    const arr = (await r.json()) as any[];
-    const sample = arr.filter((x) => x.ip_address).slice(0, 60);
+    // DShield exposes browser-safe CORS JSON and recent observed source counts.
+    // Feodo remains a secondary C2 source, but its active list may legitimately
+    // be empty following botnet takedowns.
+    let sample: any[] = [];
+    let provider = "SANS ISC / DShield";
+    try {
+      const dshield = await fetch("https://isc.sans.edu/api/topips/records/60?json");
+      if (dshield.ok) sample = (await dshield.json()).map((item: any) => ({ ip_address: item.source, malware: "Observed attacker", reports: Number(item.reports || 0), targets: Number(item.targets || 0) }));
+    } catch { /* use secondary source */ }
+    if (!sample.length) {
+      provider = "abuse.ch / Feodo Tracker";
+      const response = await fetch("https://feodotracker.abuse.ch/downloads/ipblocklist.json");
+      const arr = (await response.json()) as any[];
+      sample = arr.filter((item) => item.ip_address).slice(0, 60);
+    }
     if (!sample.length) return [];
-    const ips = sample.map((x) => x.ip_address as string);
-    const famMap = new Map(sample.map((x) => [x.ip_address, x.malware || ""]));
+    const ips = sample.map((item) => item.ip_address as string);
+    const metaMap = new Map(sample.map((item) => [item.ip_address, item]));
     const geo = await geolocateBatch(ips);
     const out: ThreatRing[] = geo.map((g) => ({
       ...g,
-      family: famMap.get(g.ip) ?? "",
+      family: metaMap.get(g.ip)?.malware || "Observed attacker",
+      reports: metaMap.get(g.ip)?.reports,
+      targets: metaMap.get(g.ip)?.targets,
+      provider,
     }));
     localStorage.setItem(cacheKey, JSON.stringify(out));
     localStorage.setItem(cacheTsKey, String(Date.now()));

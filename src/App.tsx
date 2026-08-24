@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useLayers, type CablePath } from "./hooks/useLayers";
 import { GlobeHero } from "./components/GlobeHero";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -8,13 +8,39 @@ import { PortfolioLanding } from "./components/PortfolioLanding";
 import { BuildPage } from "./components/BuildPage";
 import { CaseStudyPage } from "./components/CaseStudyPage";
 import { BackgroundFX } from "./components/BackgroundFX";
-import { ScrollProgress, SectionSep } from "./components/motion";
+import { PageCascadeFX, ScrollProgress, SectionSep } from "./components/motion";
+import { ChevronDown } from "lucide-react";
 
 function HomePage() {
   const { active, toggle, activeEntries, arcsData, cables, cableMeta, threats, marine, marineMeta, home } = useLayers();
   const [selected, setSelected] = useState<any | null>(null);
   const [selectedCable, setSelectedCable] = useState<CablePath | null>(null);
   const [flyTarget, setFlyTarget] = useState<{ lat: number; lng: number; id: string } | null>(null);
+  const clickSound = useRef<HTMLAudioElement | null>(null);
+  const hoverSound = useRef<HTMLAudioElement | null>(null);
+  const menuOpenSound = useRef<HTMLAudioElement | null>(null);
+
+  const playSound = (ref: typeof clickSound, src: string, volume: number) => {
+    const audio = ref.current || new Audio(src);
+    ref.current = audio;
+    audio.volume = volume;
+    audio.currentTime = 0;
+    void audio.play().catch(() => undefined);
+  };
+  const openEntry = (entry: any | null) => {
+    setSelected(entry);
+    if (entry) {
+      setSelectedCable(null);
+      playSound(menuOpenSound, "/sounds/menu-open.wav", .28);
+    }
+  };
+  const openCable = (cable: CablePath | null) => {
+    setSelectedCable(cable);
+    if (cable) {
+      setSelected(null);
+      playSound(menuOpenSound, "/sounds/menu-open.wav", .28);
+    }
+  };
 
   // Live overlay counts for the HUD telemetry bar
   const overlayStats = [
@@ -40,9 +66,19 @@ function HomePage() {
     <main id="top" className="relative w-full bg-space-bg">
       {/* Persistent 3D background + scroll progress rail */}
       <BackgroundFX />
+      <PageCascadeFX />
       <ScrollProgress />
 
-      <section className="globe-floating relative h-dvh w-screen overflow-hidden">
+      <section className="globe-floating relative h-dvh w-screen overflow-hidden"
+        onClickCapture={(event) => {
+          const target = (event.target as HTMLElement).closest("button,a,[data-sound-interactive]");
+          if (target && !target.closest("[data-opens-panel]")) playSound(clickSound, "/sounds/click.wav", .24);
+        }}
+        onPointerOverCapture={(event) => {
+          const target = (event.target as HTMLElement).closest("button,a,[data-sound-interactive]");
+          const previous = (event.relatedTarget as HTMLElement | null)?.closest?.("button,a,[data-sound-interactive]");
+          if (target && target !== previous) playSound(hoverSound, "/sounds/hover_over.wav", .14);
+        }}>
         <ErrorBoundary>
           <GlobeHero
             active={active}
@@ -53,9 +89,9 @@ function HomePage() {
             marine={marine}
             home={home}
             selected={selected}
-            onSelect={(entry) => { setSelected(entry); if (entry) setSelectedCable(null); }}
+            onSelect={openEntry}
             selectedCable={selectedCable}
-            onSelectCable={(cable) => { setSelectedCable(cable); if (cable) setSelected(null); }}
+            onSelectCable={openCable}
             flyTarget={flyTarget}
           />
         </ErrorBoundary>
@@ -63,12 +99,15 @@ function HomePage() {
           active={active}
           onToggle={(id) => {
             toggle(id);
+            setSelected(null);
+            setSelectedCable(null);
+            setFlyTarget(null);
             if (id === "cables" && active.has("cables")) setSelectedCable(null);
           }}
           selected={selected}
-          onSelect={(entry) => { setSelected(entry); if (entry) setSelectedCable(null); }}
+          onSelect={openEntry}
           selectedCable={selectedCable}
-          onSelectCable={setSelectedCable}
+          onSelectCable={openCable}
           cableMeta={cableMeta}
           entries={activeEntries}
           overlayStats={overlayStats}
@@ -78,9 +117,13 @@ function HomePage() {
           onFlyTo={(e) => {
             setSelected(e.entry);
             setSelectedCable(null);
+            playSound(menuOpenSound, "/sounds/menu-open.wav", .28);
             setFlyTarget({ lat: e.lat, lng: e.lng, id: e.id + "-" + Date.now() });
           }}
         />
+        <button className="hero-scroll-cue" aria-label="Scroll to portfolio content" onClick={() => document.getElementById("portfolio-start")?.scrollIntoView({ behavior:"smooth", block:"start" })}>
+          <span>EXPLORE</span><ChevronDown size={14}/>
+        </button>
       </section>
 
       <SectionSep />

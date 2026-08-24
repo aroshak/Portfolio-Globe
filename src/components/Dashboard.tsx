@@ -2,15 +2,13 @@ import { useState, useEffect, type ReactNode } from "react";
 import {
   Layers, AlertTriangle, Satellite, GraduationCap,
   Briefcase, Award, Droplet, X, ExternalLink, MapPin,
-  Star, ChevronLeft, ChevronRight, Calendar,
-  Wrench, FolderKanban, FileText, Cpu,
-  Trophy, BookOpen, Info,
+  Wrench, FolderKanban, FileText, Cpu, CheckCircle2,
+  Trophy, BookOpen, ListChecks, ShieldCheck,
 } from "lucide-react";
 import type { CableMeta, CablePath, LayerId } from "../hooks/useLayers";
 import { LAYER_GROUPS } from "../hooks/useLayers";
 import { CableInfoPanel } from "./CableInfoPanel";
 import { getEnrichedEntry, type EnrichedEntry } from "../data/enriched-entries";
-import { fetchPlaceInfo, type PlaceInfo } from "../lib/places";
 import { githubProfile } from "../data/github-repos";
 
 const TAB_COLOR: Record<string, string> = {
@@ -104,36 +102,14 @@ function StatBox({
 
 export function Dashboard({ active, onToggle, selected, onSelect, entries, overlayStats, selectedCable, onSelectCable, cableMeta }: DashboardProps) {
   const [enriched, setEnriched] = useState<EnrichedEntry | null>(null);
-  const [placeInfo, setPlaceInfo] = useState<PlaceInfo | null>(null);
-  const [imgLoading, setImgLoading] = useState(false);
-  const [imgFailed, setImgFailed] = useState(false);
 
   useEffect(() => {
     if (!selected) {
       setEnriched(null);
-      setPlaceInfo(null);
-      setImgLoading(false);
-      setImgFailed(false);
       return;
     }
-    let cancelled = false;
     const e = getEnrichedEntry(selected.id);
     setEnriched(e || null);
-    setPlaceInfo(null);
-    setImgFailed(false);
-
-    // Search the actual entity: "Mahanama College, Colombo" etc.
-    const city = selected.location.name.split(",")[0].trim();
-    const query = `${selected.org}, ${city}`;
-    setImgLoading(true);
-    fetchPlaceInfo(query, { lat: selected.location.lat, lng: selected.location.lng }).then((info) => {
-      if (cancelled) return;
-      setPlaceInfo(info);
-      setImgLoading(false);
-    });
-    return () => {
-      cancelled = true;
-    };
   }, [selected]);
 
   /* ── Shared HUD ── */
@@ -210,39 +186,27 @@ export function Dashboard({ active, onToggle, selected, onSelect, entries, overl
   /* ── Selection active ── */
   const color = TAB_COLOR[enriched.tab] ?? "#4adede";
   const title = enriched.title.split("\u2014")[0].split("-")[0].trim();
-  const photo = placeInfo?.photoUri ?? null;
-  const mapsUrl = placeInfo?.googleMapsUri || enriched.locationInfo.mapsUrl;
+  const mapsUrl = enriched.locationInfo.mapsUrl;
+  const primaryCount = enriched.workstreams.reduce((sum, group) => sum + group.items.length, 0);
+  const skillCount = enriched.capabilities.reduce((sum, group) => sum + group.items.length, 0);
 
   return (
     <div className="absolute inset-0 pointer-events-none z-20 select-none">
       {hud}
 
       {/* ══════════════════ SIDE PANEL ══════════════════ */}
-      <aside className="absolute right-4 top-16 bottom-8 w-[460px] pointer-events-auto z-30">
+      <aside key={enriched.id} className="info-panel-reveal absolute right-4 top-16 bottom-8 w-[460px] pointer-events-auto z-30">
         <div className="glass-dark rounded-2xl h-full overflow-y-auto">
-          <div className="flex flex-col gap-3 p-4">
+          <div className="panel-cascade flex flex-col gap-3 p-4">
 
-            {/* ── HERO: entity image + identity overlay ── */}
+            {/* ── HERO: portfolio-owned identity, never external entity copy ── */}
             <div className="relative w-full h-40 rounded-xl overflow-hidden shrink-0 border"
               style={{ boxShadow: `0 8px 32px rgba(0,0,0,0.5), inset 0 0 0 1px ${color}33` }}>
-              {photo && !imgFailed ? (
-                <img src={photo} alt={placeInfo?.displayName || enriched.org}
-                  onLoad={() => setImgLoading(false)} onError={() => { setImgFailed(true); setImgLoading(false); }}
-                  className="absolute inset-0 w-full h-full object-cover" />
-              ) : imgLoading ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-space-deep">
-                  <div className="w-6 h-6 border-2 border-cyan-glow/40 border-t-cyan-glow rounded-full animate-spin" />
-                </div>
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-space-deep">
-                  <div className="absolute inset-0 opacity-70" style={{ background: `radial-gradient(circle at 28% 20%, ${color}45, transparent 42%), linear-gradient(135deg, #101923, #050810)` }} />
-                  <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px)", backgroundSize: "24px 24px" }} />
-                  <span className="relative text-[11px] font-mono text-text-secondary tracking-[0.2em] text-center px-8">
-                    {enriched.org.toUpperCase()}<small className="block mt-2 text-[8px] text-text-muted">{enriched.location.name.toUpperCase()}</small>
-                  </span>
-                </div>
-              )}
-              {/* gradient scrim */}
+              <div className="absolute inset-0 overflow-hidden bg-space-deep">
+                <div className="absolute inset-0 opacity-80" style={{ background: `radial-gradient(circle at 20% 20%, ${color}55, transparent 38%), radial-gradient(circle at 85% 100%, ${color}22, transparent 45%), linear-gradient(135deg, #101923, #050810)` }} />
+                <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px)", backgroundSize: "24px 24px" }} />
+                <div className="absolute right-8 top-7 h-20 w-20 rounded-full border opacity-30" style={{ borderColor: color, boxShadow: `0 0 30px ${color}44, inset 0 0 20px ${color}33` }} />
+              </div>
               <div className="absolute inset-0 bg-gradient-to-t from-[#060a12] via-[#060a12]/35 to-transparent" />
 
               {/* close */}
@@ -257,17 +221,13 @@ export function Dashboard({ active, onToggle, selected, onSelect, entries, overl
                   style={{ color, borderColor: `${color}66` }}>
                   {TAB_LABEL[enriched.tab]}
                 </span>
-                {placeInfo?.photoAttribution && (
-                  <span className="text-[8px] text-text-muted font-mono bg-black/40 backdrop-blur px-1.5 py-1 rounded">
-                    📷 {placeInfo.photoAttribution}
-                  </span>
-                )}
+                <span className="text-[8px] text-text-muted font-mono bg-black/40 backdrop-blur px-1.5 py-1 rounded flex items-center gap-1"><ShieldCheck size={9} style={{ color }} /> PORTFOLIO RECORD</span>
               </div>
 
               {/* identity */}
               <div className="absolute bottom-3 left-4 right-4">
                 <div className="text-[9px] tracking-[0.14em] uppercase font-semibold mb-0.5" style={{ color }}>
-                  {placeInfo?.displayName || enriched.org}
+                  {enriched.org}
                 </div>
                 <div className="text-[16px] font-semibold text-text-primary leading-snug">
                   {title}
@@ -284,82 +244,41 @@ export function Dashboard({ active, onToggle, selected, onSelect, entries, overl
 
             {/* ── STATS ROW ── */}
             <div className="grid grid-cols-3 gap-2">
-              <StatBox accent={color} icon={Trophy} value={enriched.achievements.length} label="Outcomes" />
-              <StatBox accent={color} icon={Wrench} value={enriched.technologies.length} label="Core systems" />
-              <StatBox accent={color} icon={FolderKanban} value={enriched.relatedProjects.length} label="Linked projects" />
+              <StatBox accent={color} icon={ListChecks} value={primaryCount} label={enriched.tab === "education" ? "Study items" : "Work items"} />
+              <StatBox accent={color} icon={Wrench} value={skillCount} label="Capabilities" />
+              <StatBox accent={color} icon={Trophy} value={enriched.outcomes.length} label="Outcomes" />
             </div>
 
-            {/* ── ABOUT / ADDRESS ── */}
-            {(placeInfo?.formattedAddress || placeInfo?.editorialSummary) && (
-              <Section label="Entity Intel" icon={Info} accent={color}>
-                <div className="grid grid-cols-[50px_1fr] gap-y-2 text-[11px]">
-                  {placeInfo.formattedAddress && (
-                    <>
-                      <span className="text-[9px] font-mono text-text-muted pt-0.5">ADDR</span>
-                      <span className="text-text-secondary leading-relaxed">{placeInfo.formattedAddress}</span>
-                    </>
-                  )}
-                  {placeInfo.editorialSummary && (
-                    <>
-                      <span className="text-[9px] font-mono text-text-muted pt-0.5">INFO</span>
-                      <span className="text-text-secondary leading-relaxed italic">{placeInfo.editorialSummary}</span>
-                    </>
-                  )}
-                  <span className="text-[9px] font-mono text-text-muted pt-0.5">LINK</span>
-                  <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1 hover:underline font-mono text-[10px]" style={{ color }}>
-                    Open in Google Maps <ExternalLink size={9} />
-                  </a>
-                  <span className="text-[9px] font-mono text-text-muted pt-0.5">SOURCE</span>
-                  <span className="text-text-secondary text-[10px] font-mono">
-                    {placeInfo.source === "google" ? "Google Places" : "Wikipedia / Wikimedia Commons"}
-                  </span>
-                </div>
-              </Section>
-            )}
+            <Section label="Record summary" icon={BookOpen} accent={color}>
+              <p className="text-[12px] text-text-secondary leading-relaxed">{enriched.summary}</p>
+              <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="mt-2 flex items-center gap-1 text-[9px] font-mono hover:underline" style={{ color }}>
+                <MapPin size={9} /> LOCATION COORDINATES <ExternalLink size={8} />
+              </a>
+            </Section>
 
-            {/* ── BRIEFING ── */}
-            <Section label="Briefing" icon={BookOpen} accent={color}>
-              <div className="space-y-3">
-                {(enriched.cards || []).map((c, i) => (
-                  <div key={i} className="border-l-2 pl-3" style={{ borderColor: `${color}66` }}>
-                    <div className="text-[9px] tracking-[0.14em] uppercase font-semibold font-mono mb-1" style={{ color }}>
-                      {c.heading}
-                    </div>
-                    <div className="text-[12px] text-text-secondary leading-relaxed">{c.body}</div>
+            <Section label={enriched.tab === "education" ? "Study breakdown" : enriched.tab === "certifications" ? "Credential breakdown" : "Work breakdown"} icon={ListChecks} accent={color}>
+              <div className="grid grid-cols-2 gap-2">
+                {enriched.workstreams.map((group) => (
+                  <div key={group.title} className="glass-clear rounded-lg p-3 border border-white/[0.05]">
+                    <div className="text-[9px] tracking-[0.12em] uppercase font-semibold font-mono mb-2" style={{ color }}>{group.title}</div>
+                    <ul className="space-y-1.5">{group.items.map((item) => <li key={item} className="flex gap-2 text-[10.5px] leading-relaxed text-text-secondary"><CheckCircle2 size={10} className="mt-0.5 shrink-0" style={{ color }} />{item}</li>)}</ul>
                   </div>
                 ))}
               </div>
             </Section>
 
-            {/* ── ACHIEVEMENTS ── */}
-            {enriched.achievements.length > 0 && (
-              <Section label="Achievements" icon={Trophy} accent={color}>
-                <ul className="space-y-2">
-                  {enriched.achievements.map((a, i) => (
-                    <li key={i} className="flex items-start gap-2.5">
-                      <span className="mt-[7px] w-1.5 h-1.5 rounded-full shrink-0"
-                        style={{ background: color, boxShadow: `0 0 6px ${color}` }} />
-                      <span className="text-[12px] text-text-secondary leading-relaxed">{a}</span>
-                    </li>
-                  ))}
-                </ul>
+            <Section label={enriched.tab === "education" ? "Learning & capability" : "Skills & systems"} icon={Wrench} accent={color}>
+              <div className="space-y-2">
+                {enriched.capabilities.map((group) => (
+                  <div key={group.title}>
+                    <div className="text-[8px] uppercase tracking-[0.14em] font-mono text-text-muted mb-1.5">{group.title}</div>
+                    <div className="flex flex-wrap gap-1.5">{group.items.map((item) => <span key={item} className="text-[9px] px-2 py-1 rounded-md border font-mono" style={{ borderColor: `${color}35`, color, background: `${color}0b` }}>{item}</span>)}</div>
+                  </div>
+                ))}
+              </div>
               </Section>
-            )}
 
-            {/* ── SYSTEMS ── */}
-            {enriched.technologies.length > 0 && (
-              <Section label="Systems" icon={Wrench} accent={color}>
-                <div className="flex flex-wrap gap-1.5">
-                  {enriched.technologies.map((t) => (
-                    <span key={t} className="text-[9px] px-2 py-1 rounded-md border font-mono"
-                      style={{ borderColor: `${color}30`, color, background: `${color}08` }}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </Section>
-            )}
+            {enriched.outcomes.length > 0 && <Section label="Evidence & outcomes" icon={Trophy} accent={color}><ul className="space-y-2">{enriched.outcomes.map((item) => <li key={item} className="flex items-start gap-2.5"><span className="mt-[7px] w-1.5 h-1.5 rounded-full shrink-0" style={{ background: color, boxShadow: `0 0 6px ${color}` }} /><span className="text-[12px] text-text-secondary leading-relaxed">{item}</span></li>)}</ul></Section>}
 
             {/* ── DEPLOYMENTS ── */}
             {enriched.relatedProjects.length > 0 && (
@@ -392,37 +311,9 @@ export function Dashboard({ active, onToggle, selected, onSelect, entries, overl
               </Section>
             )}
 
-            {/* ── TRAJECTORY ── */}
-            {(enriched.journeyContext.previousRole || enriched.journeyContext.nextRole) && (
-              <Section label="Trajectory" icon={Calendar} accent={color}>
-                <div className="flex items-stretch gap-2">
-                  {enriched.journeyContext.previousRole && (
-                    <div className="flex-1 glass-clear rounded-lg p-2.5">
-                      <div className="text-[8px] font-mono text-text-muted flex items-center gap-1 mb-1">
-                        <ChevronLeft size={9} /> PREVIOUS
-                      </div>
-                      <div className="text-[10.5px] text-text-primary font-semibold leading-snug">
-                        {enriched.journeyContext.previousRole.title.split("\u2014")[0].split("-")[0].trim()}
-                      </div>
-                      <div className="text-[9px] text-text-muted mt-0.5">{enriched.journeyContext.previousRole.org}</div>
-                      <div className="text-[8px] font-mono text-text-muted mt-0.5">{enriched.journeyContext.previousRole.period}</div>
-                    </div>
-                  )}
-                  {enriched.journeyContext.nextRole && (
-                    <div className="flex-1 glass-clear rounded-lg p-2.5">
-                      <div className="text-[8px] font-mono text-text-muted flex items-center gap-1 justify-end mb-1">
-                        NEXT <ChevronRight size={9} />
-                      </div>
-                      <div className="text-[10.5px] text-text-primary font-semibold leading-snug">
-                        {enriched.journeyContext.nextRole.title.split("\u2014")[0].split("-")[0].trim()}
-                      </div>
-                      <div className="text-[9px] text-text-muted mt-0.5">{enriched.journeyContext.nextRole.org}</div>
-                      <div className="text-[8px] font-mono text-text-muted mt-0.5">{enriched.journeyContext.nextRole.period}</div>
-                    </div>
-                  )}
-                </div>
-              </Section>
-            )}
+            <Section label="Source control" icon={ShieldCheck} accent={color}>
+              <div className="flex flex-wrap gap-1.5">{enriched.sources.map((source) => <span key={source} className="flex items-center gap-1 text-[8px] px-2 py-1 rounded border border-white/10 text-text-muted font-mono"><CheckCircle2 size={9} style={{ color }} />{source.toUpperCase()}</span>)}</div>
+            </Section>
 
             {/* ── FOOTER ── */}
             <div className="flex items-center justify-between pt-3 border-t border-white/5">

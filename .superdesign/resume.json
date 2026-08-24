@@ -1,32 +1,40 @@
 {
-  "projectId": "4ea61cc5-fab4-4db7-b190-41085f4f649f",
-  "projectTitle": "Arosha Portfolio — AI, Automation & Infrastructure",
+  "schemaVersion": 1,
   "targets": {
     "landing": {
-      "route": "/",
-      "baselineDraftId": "b65853e2-f0c9-4afe-a690-bef4eff854b4",
-      "activeDraftId": "b65853e2-f0c9-4afe-a690-bef4eff854b4",
-      "status": "awaiting-user-selection",
-      "branches": [
-        {
-          "draftId": "fa5d2ed8-4ffd-4119-bb13-f864f3be73b2",
-          "description": "Executive editorial direction led by What I bring"
-        },
-        {
-          "draftId": "44b93976-877d-4f70-966c-420a26d701b3",
-          "description": "Conversion-focused direction led by What I can offer your team"
-        }
-      ],
+      "targetKind": "existing-ui",
+      "projectId": "4ea61cc5-fab4-4db7-b190-41085f4f649f",
+      "baselineDraftId": "b4778708-81cd-4beb-8905-3fdcc39d8d51",
+      "activeDraftId": "b4778708-81cd-4beb-8905-3fdcc39d8d51",
+      "designSystemPath": ".superdesign/design-system.md",
       "contextFiles": [
         ".superdesign/design-system.md",
         ".superdesign/init/theme.md",
         "src/App.tsx",
-        "src/components/ServicesPanel.tsx",
-        "src/components/BuildStory.tsx",
-        "src/components/ProjectGrid.tsx:1:180",
-        "src/data/services.ts",
-        "src/data/portfolio-data.json"
-      ]
+        "src/components/GlobeHero.tsx",
+        "src/components/Dashboard.tsx",
+        "src/components/PortfolioLanding.tsx",
+        "src/hooks/useLayers.ts",
+        "src/styles/index.css"
+      ],
+      "fingerprints": {
+        ".superdesign/design-system.md": "694040ce3b5e64db5570beff370afd6d613469acfda4a95632aeb1c949b60bf4",
+        ".superdesign/init/theme.md": "080174e32e85ce87ccc309cef934636786fb7ade23bdb3b7f92fb150aefe72fd",
+        "src/App.tsx": "34b7c3bf7745befd2ef7c1904406f208f0ac0915dfc64cd26bd9e26ac4489ae5",
+        "src/components/GlobeHero.tsx": "2921e8e97580173c3a68ef51f52303e587243c46a5691718a206df42dea9f0c8",
+        "src/components/Dashboard.tsx": "c6df9d3e34274293e55f4af277da9aa48f02b8f5f62d80be3ef4c6c77149f7ca",
+        "src/components/PortfolioLanding.tsx": "c2137cbc6850c04e5046e2648fcb014415af4dd93c83d224f7227048b3dbf5e3",
+        "src/hooks/useLayers.ts": "73ff87e7a791276de0e9f37694032638eb58418db21aa1bd690ca4e6f3a66ec5",
+        "src/styles/index.css": "9ceca08bec6969b832edf508babd388d15b2f1b7f9bfd0ddb5d9c7725e456d5d"
+      },
+      "drafts": {
+        "b4778708-81cd-4beb-8905-3fdcc39d8d51": {
+          "title": "Technology scroller and threat-map transition",
+          "visualDirection": "Existing cyan editorial system with WebGL stack ribbon and globe-to-flat threat view",
+          "currentVersion": 3
+        }
+      },
+      "updatedAt": "2026-08-24T00:00:00+10:00"
     }
   }
 }

@@ -3,6 +3,7 @@ import Globe, { GlobeMethods } from "react-globe.gl";
 import type { LayerId } from "../hooks/useLayers";
 import type { CablePath, ThreatRing, MarinePoint } from "../hooks/useLayers";
 import { useSatellites } from "../hooks/useSatellites";
+import { Minus, Plus, RotateCcw, Pause, Play } from "lucide-react";
 
 interface GlobeHeroProps {
   active: Set<LayerId>;
@@ -72,6 +73,8 @@ function buildLabel(entry: any, onSelect: (e: any) => void): HTMLDivElement {
   const cardCount = (entry.cards || []).length;
 
   const wrapper = document.createElement("div");
+  wrapper.dataset.soundInteractive = "true";
+  wrapper.dataset.opensPanel = "true";
   wrapper.style.cssText =
     "display:flex;flex-direction:column;align-items:center;cursor:pointer;pointer-events:auto;";
 
@@ -185,9 +188,12 @@ export function GlobeHero({
     typeof window !== "undefined" ? window.innerWidth : 1280,
     typeof window !== "undefined" ? window.innerHeight : 800,
   ]);
+  const [spinEnabled, setSpinEnabled] = useState(true);
+  const [selectedInfra, setSelectedInfra] = useState<any | null>(null);
   const sats = useSatellites(active.has("satellites"));
   const introDone = useRef(false);
-  const marineFocused = useRef(false);
+  const layerSignature = [...active].sort().join("|");
+  const previousLayers = useRef(layerSignature);
   const introTimers = useRef<number[]>([]);
   const flightTimer = useRef<number | null>(null);
 
@@ -210,17 +216,34 @@ export function GlobeHero({
     g.pointOfView({ lat: 12, lng: 80, altitude: 3.2 }, 0);
     const t = window.setTimeout(() => {
       g.pointOfView({ lat: home.lat, lng: home.lng, altitude: 2.2 }, 2200);
-      // After intro completes, stop auto-rotate
+      // After intro completes, idle rotation takes over.
       const inner = window.setTimeout(() => {
         introDone.current = true;
         const controls = g.controls() as any;
-        if (controls) controls.autoRotate = false;
+        if (controls) controls.autoRotate = !selected && !selectedCable && spinEnabled;
       }, 2500);
       introTimers.current.push(inner);
     }, 600);
     introTimers.current.push(t);
     return () => { introTimers.current.forEach(window.clearTimeout); introTimers.current = []; };
   }, [home.lat, home.lng]);
+
+  // A layer change returns to a whole-world operational view.
+  useEffect(() => {
+    if (previousLayers.current === layerSignature) return;
+    previousLayers.current = layerSignature;
+    const g = globeRef.current;
+    if (!g) return;
+    g.pointOfView({ lat: 12, lng: 20, altitude: 2.8 }, 1400);
+  }, [layerSignature]);
+
+  // Rotate slowly while browsing; any selected record pauses the globe.
+  useEffect(() => {
+    const controls = globeRef.current?.controls() as any;
+    if (!controls) return;
+    controls.autoRotateSpeed = .32;
+    controls.autoRotate = spinEnabled && !selected && !selectedCable;
+  }, [spinEnabled, selected, selectedCable, layerSignature]);
 
   // Fly-to from timeline
   useEffect(() => {
@@ -245,19 +268,32 @@ export function GlobeHero({
     return () => { if (flightTimer.current !== null) window.clearTimeout(flightTimer.current); };
   }, [flyTarget]);
 
-  // Marine infrastructure is densest around the North Sea. Focus that region
-  // once the lazy snapshot is ready so enabling the layer produces an
-  // immediately visible result instead of leaving the user over Melbourne.
-  useEffect(() => {
-    const enabled = active.has("marine");
-    if (!enabled) {
-      marineFocused.current = false;
-      return;
+  const adjustZoom = (delta: number) => {
+    const g = globeRef.current;
+    if (!g) return;
+    const current = g.pointOfView() as { lat: number; lng: number; altitude: number };
+    g.pointOfView({ ...current, altitude: Math.min(4, Math.max(.35, current.altitude + delta)) }, 450);
+  };
+
+  const resetWorld = () => globeRef.current?.pointOfView({ lat: 12, lng: 20, altitude: 2.8 }, 900);
+
+  const selectNearbyCable = ({ lat, lng }: { lat: number; lng: number }) => {
+    if (!active.has("cables")) return;
+    let nearest: CablePath | null = null;
+    let best = 2.25;
+    for (const cable of cables) {
+      const step = Math.max(1, Math.floor(cable.coords.length / 120));
+      for (let index = 0; index < cable.coords.length; index += step) {
+        const point = cable.coords[index];
+        const latDelta = point[1] - lat;
+        const rawLng = Math.abs(point[0] - lng);
+        const lngDelta = Math.min(rawLng, 360 - rawLng) * Math.cos(lat * Math.PI / 180);
+        const distance = Math.hypot(latDelta, lngDelta);
+        if (distance < best) { best = distance; nearest = cable; }
+      }
     }
-    if (!marine.length || marineFocused.current || !globeRef.current) return;
-    marineFocused.current = true;
-    globeRef.current.pointOfView({ lat: 55, lng: 3, altitude: 1.65 }, 1600);
-  }, [active, marine.length]);
+    if (nearest) onSelectCable(nearest);
+  };
 
   // ── Points: one shared layer, every point carries its own hover label ──
   // (satlas pattern: colour-coded categories + hover info)
@@ -277,6 +313,8 @@ export function GlobeHero({
     }));
     const marinePts = active.has("marine")
       ? marine.map((m) => ({
+          kind: "marine",
+          source: m,
           lat: m.lat,
           lng: m.lng,
           alt: 0.012,
@@ -306,14 +344,16 @@ export function GlobeHero({
       : [];
     const threatPts = active.has("threats")
       ? threats.map((t) => ({
+          kind: "threat",
+          source: t,
           lat: t.lat,
           lng: t.lng,
-          alt: 0.004,
-          r: 0.014,
+          alt: 0.016,
+          r: 0.065,
           color: threatColor(t.family),
           label: tip(
-            `⚠ ${t.family || "Botnet"} C2`,
-            `${t.ip}${t.country ? ` · ${t.country}` : ""} · Feodo Tracker`,
+            `⚠ ${t.family || "Observed threat source"}`,
+            `${t.ip}${t.country ? ` · ${t.country}` : ""}${t.reports ? ` · ${t.reports.toLocaleString()} reports` : ""}${t.targets ? ` · ${t.targets.toLocaleString()} targets` : ""} · ${t.provider || "Open threat feed"}`,
             threatColor(t.family)
           ),
         }))
@@ -348,10 +388,7 @@ export function GlobeHero({
     () => (active.has("cables") ? cables : []),
     [cables, active]
   );
-  const threatRings = useMemo(
-    () => (active.has("threats") ? threats : []),
-    [threats, active]
-  );
+  const threatRings = active.has("threats") ? threats : [];
   const visibleRings = useMemo(() => [
     ...threatRings.map((ring) => ({ ...ring, kind: "threat" as const })),
     ...(selected?.location ? [{
@@ -364,7 +401,7 @@ export function GlobeHero({
 
   return (
     <div ref={containerRef} className="absolute inset-0">
-      <Globe
+      <div className="globe-scene-layer"><Globe
         ref={globeRef as any}
         width={size[0]}
         height={size[1]}
@@ -385,6 +422,8 @@ export function GlobeHero({
         pointRadius="r"
         pointResolution={12}
         pointLabel={(d: any) => d.label || ""}
+        onPointClick={(point: any) => { if (point.kind) setSelectedInfra(point); }}
+        onPointHover={(point: any) => { if (containerRef.current) containerRef.current.style.cursor = point ? "pointer" : "default"; }}
         // Always-visible floating labels
         htmlElementsData={htmlElementsData}
         htmlLat={(d: any) => d.location.lat}
@@ -417,6 +456,7 @@ export function GlobeHero({
         pathLabel={(p: any) => tip((p as CablePath).name, "submarine cable · TeleGeography", (p as CablePath).color)}
         pathStroke={(p: any) => (selectedCable?.id === (p as CablePath).id ? 1.8 : 1.05)}
         onPathClick={(p: any) => onSelectCable(p as CablePath)}
+        onPathHover={(path: any) => { if (containerRef.current) containerRef.current.style.cursor = path ? "pointer" : "default"; }}
         pathDashLength={0.1}
         pathDashGap={0.008}
         pathDashAnimateTime={12000}
@@ -432,7 +472,20 @@ export function GlobeHero({
         ringMaxRadius={(r: any) => r.kind === "selection" ? 2.4 : 4}
         ringPropagationSpeed={(r: any) => r.kind === "selection" ? 1.25 : 2}
         ringRepeatPeriod={(r: any) => r.kind === "selection" ? 650 : 900}
-      />
+        onGlobeClick={selectNearbyCable}
+      /></div>
+      <div className="canvas-controls glass-dark" aria-label="Globe controls">
+        <button title="Zoom in" aria-label="Zoom in" onClick={() => adjustZoom(-.38)}><Plus size={12} /></button>
+        <button title="Zoom out" aria-label="Zoom out" onClick={() => adjustZoom(.38)}><Minus size={12} /></button>
+        <button title="Show whole world" aria-label="Show whole world" onClick={resetWorld}><RotateCcw size={11} /></button>
+        <button title={spinEnabled ? "Pause rotation" : "Resume rotation"} aria-label={spinEnabled ? "Pause rotation" : "Resume rotation"} onClick={() => setSpinEnabled((value) => !value)}>{spinEnabled ? <Pause size={11} /> : <Play size={11} />}</button>
+      </div>
+      {selectedInfra && <div className="infra-quick-card glass-dark">
+        <button onClick={() => setSelectedInfra(null)}>×</button>
+        <small>{selectedInfra.kind === "threat" ? "THREAT SOURCE" : "MARINE INFRASTRUCTURE"}</small>
+        <strong>{selectedInfra.kind === "threat" ? selectedInfra.source.ip : selectedInfra.source.category.replaceAll("_", " ")}</strong>
+        {selectedInfra.kind === "threat" ? <><span>{selectedInfra.source.country || "Unknown region"} · {selectedInfra.source.provider || "Open threat feed"}</span><em>{(selectedInfra.source.reports || 0).toLocaleString()} reports · {(selectedInfra.source.targets || 0).toLocaleString()} targets</em></> : <><span>Detection confidence {(selectedInfra.source.score * 100).toFixed(0)}%</span><em>Satlas marine infrastructure dataset</em></>}
+      </div>}
     </div>
   );
 }
