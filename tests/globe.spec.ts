@@ -18,7 +18,7 @@ test("globe renders without console errors", async ({ page }) => {
   await expect(canvas).toHaveCount(1, { timeout: 5000 });
 
   // Check dashboard chrome rendered
-  await expect(page.getByText("AROSHA")).toBeVisible({ timeout: 5000 });
+  await expect(page.getByRole("link", { name: "Arosha Kaluarachchi home" })).toBeVisible({ timeout: 5000 });
 
   // Check timeline rendered
   await expect(page.getByText("TIMELINE")).toBeVisible({ timeout: 5000 });

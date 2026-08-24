@@ -20,11 +20,10 @@ test("side panel: entity search + photo + organized UI", async ({ page }) => {
   await page.waitForTimeout(4500); // let Places JS API load + search
 
   // ── Panel assertions ──
-  // Tab badge
-  await expect(page.getByText("EDUCATION").first()).toBeVisible({ timeout: 5000 });
-  // Org name in hero (from Places entity search, not just city)
   const hero = page.locator("aside.right-4.top-16");
-  await expect(hero).toBeVisible();
+  await expect(hero).toBeVisible({ timeout: 5000 });
+  // Scope duplicated labels to the open information panel.
+  await expect(hero.getByText("EDUCATION", { exact: true })).toBeVisible();
 
   // Stats row present (Entity Type / Since)
   await expect(page.getByText("ENTITY TYPE")).toBeVisible();
