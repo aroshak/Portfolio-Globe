@@ -10,6 +10,7 @@ import { CaseStudyPage } from "./components/CaseStudyPage";
 import { BackgroundFX } from "./components/BackgroundFX";
 import { PageCascadeFX, ScrollProgress, SectionSep } from "./components/motion";
 import { ChevronDown } from "lucide-react";
+import { BackToTop } from "./components/BackToTop";
 
 function HomePage() {
   const { active, toggle, activeEntries, arcsData, cables, cableMeta, threats, threatMeta, marine, marineMeta, home } = useLayers();
@@ -20,6 +21,22 @@ function HomePage() {
   const hoverSound = useRef<HTMLAudioElement | null>(null);
   const menuOpenSound = useRef<HTMLAudioElement | null>(null);
   const suppressNextClickSound = useRef(false);
+
+  useEffect(() => {
+    const previousRestoration = history.scrollRestoration;
+    history.scrollRestoration = "manual";
+    const resetHome = () => {
+      if ((window.location.pathname.replace(/\/$/, "") || "/") === "/") window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    };
+    resetHome();
+    const frame = window.requestAnimationFrame(resetHome);
+    window.addEventListener("pageshow", resetHome);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("pageshow", resetHome);
+      history.scrollRestoration = previousRestoration;
+    };
+  }, []);
 
   useEffect(() => {
     const audio = new Audio("/sounds/menu-open.wav");
@@ -104,6 +121,7 @@ function HomePage() {
       <BackgroundFX />
       <PageCascadeFX />
       <ScrollProgress />
+      <BackToTop />
 
       <section className="globe-floating relative h-dvh w-screen overflow-hidden"
         onClickCapture={(event) => {
