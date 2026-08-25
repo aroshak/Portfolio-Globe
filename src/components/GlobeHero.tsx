@@ -189,6 +189,7 @@ export function GlobeHero({
     typeof window !== "undefined" ? window.innerHeight : 800,
   ]);
   const [spinEnabled, setSpinEnabled] = useState(true);
+  const [zoomLevel, setZoomLevel] = useState(33);
   const [selectedInfra, setSelectedInfra] = useState<any | null>(null);
   const sats = useSatellites(active.has("satellites"));
   const introDone = useRef(false);
@@ -275,7 +276,19 @@ export function GlobeHero({
     g.pointOfView({ ...current, altitude: Math.min(4, Math.max(.35, current.altitude + delta)) }, 450);
   };
 
-  const resetWorld = () => globeRef.current?.pointOfView({ lat: 12, lng: 20, altitude: 2.8 }, 900);
+  const setZoom = (level: number) => {
+    const g = globeRef.current;
+    if (!g) return;
+    const current = g.pointOfView() as { lat: number; lng: number; altitude: number };
+    const altitude = 4 - (Math.min(100, Math.max(0, level)) / 100) * 3.65;
+    setZoomLevel(level);
+    g.pointOfView({ ...current, altitude }, 0);
+  };
+
+  const resetWorld = () => {
+    setZoomLevel(33);
+    globeRef.current?.pointOfView({ lat: 12, lng: 20, altitude: 2.8 }, 900);
+  };
 
   const selectNearbyCable = ({ lat, lng }: { lat: number; lng: number }) => {
     if (!active.has("cables")) return;
@@ -472,13 +485,25 @@ export function GlobeHero({
         ringMaxRadius={(r: any) => r.kind === "selection" ? 2.4 : 4}
         ringPropagationSpeed={(r: any) => r.kind === "selection" ? 1.25 : 2}
         ringRepeatPeriod={(r: any) => r.kind === "selection" ? 650 : 900}
+        onZoom={(view: { altitude: number }) => {
+          const level = ((4 - view.altitude) / 3.65) * 100;
+          setZoomLevel(Math.round(Math.min(100, Math.max(0, level))));
+        }}
         onGlobeClick={selectNearbyCable}
       /></div>
+      <div className="canvas-controls-dock">
       <div className="canvas-controls hero-cascade-item hero-cascade-2 glass-dark" aria-label="Globe controls">
-        <button title="Zoom in" aria-label="Zoom in" onClick={() => adjustZoom(-.38)}><Plus size={12} /></button>
         <button title="Zoom out" aria-label="Zoom out" onClick={() => adjustZoom(.38)}><Minus size={12} /></button>
+        <label className="zoom-slider-shell" title={`Zoom ${zoomLevel}%`}>
+          <span className="zoom-slider-readout">ZOOM <b>{String(zoomLevel).padStart(3, "0")}</b></span>
+          <span className="zoom-slider-track" aria-hidden="true"><i style={{ width:`${zoomLevel}%` }}/><em style={{ left:`${zoomLevel}%` }}/></span>
+          <input aria-label="Globe zoom" type="range" min="0" max="100" step="1" value={zoomLevel} onChange={(event) => setZoom(Number(event.target.value))}/>
+        </label>
+        <button title="Zoom in" aria-label="Zoom in" onClick={() => adjustZoom(-.38)}><Plus size={12} /></button>
+        <span className="canvas-control-divider" />
         <button title="Show whole world" aria-label="Show whole world" onClick={resetWorld}><RotateCcw size={11} /></button>
-        <button title={spinEnabled ? "Pause rotation" : "Resume rotation"} aria-label={spinEnabled ? "Pause rotation" : "Resume rotation"} onClick={() => setSpinEnabled((value) => !value)}>{spinEnabled ? <Pause size={11} /> : <Play size={11} />}</button>
+        <button className={spinEnabled ? "is-active" : ""} title={spinEnabled ? "Pause rotation" : "Resume rotation"} aria-label={spinEnabled ? "Pause rotation" : "Resume rotation"} onClick={() => setSpinEnabled((value) => !value)}>{spinEnabled ? <Pause size={11} /> : <Play size={11} />}</button>
+      </div>
       </div>
       {selectedInfra && <div className="infra-quick-card glass-dark">
         <button onClick={() => setSelectedInfra(null)}>×</button>
