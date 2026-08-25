@@ -23,10 +23,9 @@ function HomePage() {
   const suppressNextClickSound = useRef(false);
 
   useEffect(() => {
-    const previousRestoration = history.scrollRestoration;
     history.scrollRestoration = "manual";
     const scrollKey = "portfolio:home-scroll-y";
-    let savedPosition = Number(sessionStorage.getItem(scrollKey) || 0);
+    let savedPosition = Number(history.state?.homeScrollY ?? sessionStorage.getItem(scrollKey) ?? 0);
     let restoring = true;
     const restoreHome = () => {
       window.scrollTo({ top: Number.isFinite(savedPosition) ? savedPosition : 0, left: 0, behavior: "auto" });
@@ -35,10 +34,15 @@ function HomePage() {
       if (restoring) return;
       savedPosition = Math.max(0, Math.round(window.scrollY));
       sessionStorage.setItem(scrollKey, String(savedPosition));
+      history.replaceState({ ...(history.state ?? {}), homeScrollY: savedPosition }, "", window.location.href);
     };
     const frame = window.requestAnimationFrame(() => window.requestAnimationFrame(restoreHome));
     const delayedRestore = window.setTimeout(() => { restoreHome(); restoring = false; }, 120);
-    const onPageShow = (event: PageTransitionEvent) => { if (event.persisted) restoreHome(); };
+    const onPageShow = () => {
+      savedPosition = Number(history.state?.homeScrollY ?? sessionStorage.getItem(scrollKey) ?? savedPosition);
+      window.requestAnimationFrame(() => window.requestAnimationFrame(restoreHome));
+      window.setTimeout(restoreHome, 120);
+    };
     window.addEventListener("scroll", saveHome, { passive: true });
     window.addEventListener("pagehide", saveHome);
     window.addEventListener("pageshow", onPageShow);
@@ -50,7 +54,6 @@ function HomePage() {
       window.removeEventListener("scroll", saveHome);
       window.removeEventListener("pagehide", saveHome);
       window.removeEventListener("pageshow", onPageShow);
-      history.scrollRestoration = previousRestoration;
     };
   }, []);
 
