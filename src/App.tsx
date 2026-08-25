@@ -25,15 +25,25 @@ function HomePage() {
   useEffect(() => {
     const previousRestoration = history.scrollRestoration;
     history.scrollRestoration = "manual";
-    const resetHome = () => {
-      if ((window.location.pathname.replace(/\/$/, "") || "/") === "/") window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    const scrollKey = "portfolio:home-scroll-y";
+    const restoreHome = () => {
+      const saved = Number(sessionStorage.getItem(scrollKey) || 0);
+      window.scrollTo({ top: Number.isFinite(saved) ? saved : 0, left: 0, behavior: "auto" });
     };
-    resetHome();
-    const frame = window.requestAnimationFrame(resetHome);
-    window.addEventListener("pageshow", resetHome);
+    const saveHome = () => sessionStorage.setItem(scrollKey, String(Math.max(0, Math.round(window.scrollY))));
+    const frame = window.requestAnimationFrame(() => window.requestAnimationFrame(restoreHome));
+    const delayedRestore = window.setTimeout(restoreHome, 120);
+    const onPageShow = (event: PageTransitionEvent) => { if (event.persisted) restoreHome(); };
+    window.addEventListener("scroll", saveHome, { passive: true });
+    window.addEventListener("pagehide", saveHome);
+    window.addEventListener("pageshow", onPageShow);
     return () => {
       window.cancelAnimationFrame(frame);
-      window.removeEventListener("pageshow", resetHome);
+      window.clearTimeout(delayedRestore);
+      saveHome();
+      window.removeEventListener("scroll", saveHome);
+      window.removeEventListener("pagehide", saveHome);
+      window.removeEventListener("pageshow", onPageShow);
       history.scrollRestoration = previousRestoration;
     };
   }, []);
@@ -121,7 +131,6 @@ function HomePage() {
       <BackgroundFX />
       <PageCascadeFX />
       <ScrollProgress />
-      <BackToTop />
 
       <section className="globe-floating relative h-dvh w-screen overflow-hidden"
         onClickCapture={(event) => {
@@ -191,7 +200,10 @@ function HomePage() {
 
 export default function App() {
   const path = window.location.pathname.replace(/\/$/, "") || "/";
-  if (path === "/build") return <BuildPage />;
-  if (path.startsWith("/case-studies/")) return <CaseStudyPage slug={path.split("/").pop() || ""} />;
-  return <HomePage />;
+  const page = path === "/build"
+    ? <BuildPage />
+    : path.startsWith("/case-studies/")
+      ? <CaseStudyPage slug={path.split("/").pop() || ""} />
+      : <HomePage />;
+  return <><BackToTop />{page}</>;
 }
