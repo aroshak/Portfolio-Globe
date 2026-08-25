@@ -26,18 +26,24 @@ function HomePage() {
     const previousRestoration = history.scrollRestoration;
     history.scrollRestoration = "manual";
     const scrollKey = "portfolio:home-scroll-y";
+    let savedPosition = Number(sessionStorage.getItem(scrollKey) || 0);
+    let restoring = true;
     const restoreHome = () => {
-      const saved = Number(sessionStorage.getItem(scrollKey) || 0);
-      window.scrollTo({ top: Number.isFinite(saved) ? saved : 0, left: 0, behavior: "auto" });
+      window.scrollTo({ top: Number.isFinite(savedPosition) ? savedPosition : 0, left: 0, behavior: "auto" });
     };
-    const saveHome = () => sessionStorage.setItem(scrollKey, String(Math.max(0, Math.round(window.scrollY))));
+    const saveHome = () => {
+      if (restoring) return;
+      savedPosition = Math.max(0, Math.round(window.scrollY));
+      sessionStorage.setItem(scrollKey, String(savedPosition));
+    };
     const frame = window.requestAnimationFrame(() => window.requestAnimationFrame(restoreHome));
-    const delayedRestore = window.setTimeout(restoreHome, 120);
+    const delayedRestore = window.setTimeout(() => { restoreHome(); restoring = false; }, 120);
     const onPageShow = (event: PageTransitionEvent) => { if (event.persisted) restoreHome(); };
     window.addEventListener("scroll", saveHome, { passive: true });
     window.addEventListener("pagehide", saveHome);
     window.addEventListener("pageshow", onPageShow);
     return () => {
+      restoring = false;
       window.cancelAnimationFrame(frame);
       window.clearTimeout(delayedRestore);
       saveHome();
