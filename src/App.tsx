@@ -44,15 +44,12 @@ function HomePage() {
       window.setTimeout(restoreHome, 120);
     };
     window.addEventListener("scroll", saveHome, { passive: true });
-    window.addEventListener("pagehide", saveHome);
     window.addEventListener("pageshow", onPageShow);
     return () => {
       restoring = false;
       window.cancelAnimationFrame(frame);
       window.clearTimeout(delayedRestore);
-      saveHome();
       window.removeEventListener("scroll", saveHome);
-      window.removeEventListener("pagehide", saveHome);
       window.removeEventListener("pageshow", onPageShow);
     };
   }, []);
