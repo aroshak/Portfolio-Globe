@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLayers, type CablePath } from "./hooks/useLayers";
 import { GlobeHero } from "./components/GlobeHero";
 import { ErrorBoundary } from "./components/ErrorBoundary";
@@ -12,13 +12,43 @@ import { PageCascadeFX, ScrollProgress, SectionSep } from "./components/motion";
 import { ChevronDown } from "lucide-react";
 
 function HomePage() {
-  const { active, toggle, activeEntries, arcsData, cables, cableMeta, threats, marine, marineMeta, home } = useLayers();
+  const { active, toggle, activeEntries, arcsData, cables, cableMeta, threats, threatMeta, marine, marineMeta, home } = useLayers();
   const [selected, setSelected] = useState<any | null>(null);
   const [selectedCable, setSelectedCable] = useState<CablePath | null>(null);
   const [flyTarget, setFlyTarget] = useState<{ lat: number; lng: number; id: string } | null>(null);
   const clickSound = useRef<HTMLAudioElement | null>(null);
   const hoverSound = useRef<HTMLAudioElement | null>(null);
   const menuOpenSound = useRef<HTMLAudioElement | null>(null);
+  const suppressNextClickSound = useRef(false);
+
+  useEffect(() => {
+    const audio = new Audio("/sounds/menu-open.wav");
+    audio.preload = "auto";
+    audio.volume = .2;
+    menuOpenSound.current = audio;
+    audio.load();
+    let played = false;
+    const playBoot = () => {
+      if (played) return;
+      audio.currentTime = 0;
+      void audio.play().then(() => { played = true; }).catch(() => undefined);
+    };
+    const timer = window.setTimeout(playBoot, 420);
+    const unlock = () => {
+      if (!played) suppressNextClickSound.current = true;
+      playBoot();
+      window.removeEventListener("pointerdown", unlock, true);
+      window.removeEventListener("keydown", unlock, true);
+    };
+    window.addEventListener("pointerdown", unlock, true);
+    window.addEventListener("keydown", unlock, true);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("pointerdown", unlock, true);
+      window.removeEventListener("keydown", unlock, true);
+      audio.pause();
+    };
+  }, []);
 
   const playSound = (ref: typeof clickSound, src: string, volume: number) => {
     const audio = ref.current || new Audio(src);
@@ -58,7 +88,13 @@ function HomePage() {
           ? "MARINE ERROR"
           : `${marine.length} MARINE NODES`
       : "",
-    active.has("threats") ? `${threats.length} THREATS` : "",
+    active.has("threats")
+      ? threatMeta.status === "loading"
+        ? "THREAT FEED LOADING"
+        : threatMeta.status === "error"
+          ? "THREAT FEED ERROR"
+          : `${threats.length} THREATS`
+      : "",
     active.has("satellites") ? "SATS_LIVE" : "",
   ].filter(Boolean).join(" · ");
 
@@ -72,7 +108,8 @@ function HomePage() {
       <section className="globe-floating relative h-dvh w-screen overflow-hidden"
         onClickCapture={(event) => {
           const target = (event.target as HTMLElement).closest("button,a,[data-sound-interactive]");
-          if (target && !target.closest("[data-opens-panel]")) playSound(clickSound, "/sounds/click.wav", .24);
+          if (suppressNextClickSound.current) suppressNextClickSound.current = false;
+          else if (target && !target.closest("[data-opens-panel]")) playSound(clickSound, "/sounds/click.wav", .24);
         }}
         onPointerOverCapture={(event) => {
           const target = (event.target as HTMLElement).closest("button,a,[data-sound-interactive]");
@@ -109,6 +146,8 @@ function HomePage() {
           selectedCable={selectedCable}
           onSelectCable={openCable}
           cableMeta={cableMeta}
+          marineMeta={marineMeta}
+          threatMeta={threatMeta}
           entries={activeEntries}
           overlayStats={overlayStats}
         />

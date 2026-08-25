@@ -5,11 +5,12 @@ import {
   Wrench, FolderKanban, FileText, Cpu, CheckCircle2,
   Trophy, BookOpen, ListChecks, ShieldCheck,
 } from "lucide-react";
-import type { CableMeta, CablePath, LayerId } from "../hooks/useLayers";
+import type { CableMeta, CablePath, LayerId, MarineMeta, ThreatMeta } from "../hooks/useLayers";
 import { LAYER_GROUPS } from "../hooks/useLayers";
 import { CableInfoPanel } from "./CableInfoPanel";
 import { getEnrichedEntry, type EnrichedEntry } from "../data/enriched-entries";
 import { githubProfile } from "../data/github-repos";
+import { LayerLoadingHUD } from "./LayerLoadingHUD";
 
 const TAB_COLOR: Record<string, string> = {
   education: "#4adede",
@@ -43,6 +44,8 @@ interface DashboardProps {
   selectedCable: CablePath | null;
   onSelectCable: (cable: CablePath | null) => void;
   cableMeta: CableMeta;
+  marineMeta: MarineMeta;
+  threatMeta: ThreatMeta;
 }
 
 /* ─────────────────────────────────────────────────────────────
@@ -100,7 +103,7 @@ function StatBox({
 
 /* ───────────────────────────────────────────────────────────── */
 
-export function Dashboard({ active, onToggle, selected, onSelect, entries, overlayStats, selectedCable, onSelectCable, cableMeta }: DashboardProps) {
+export function Dashboard({ active, onToggle, selected, onSelect, entries, overlayStats, selectedCable, onSelectCable, cableMeta, marineMeta, threatMeta }: DashboardProps) {
   const [enriched, setEnriched] = useState<EnrichedEntry | null>(null);
 
   useEffect(() => {
@@ -115,14 +118,14 @@ export function Dashboard({ active, onToggle, selected, onSelect, entries, overl
   /* ── Shared HUD ── */
   const hud = (
     <>
-      <header className="hero-command-header pointer-events-auto">
+      <header className="hero-command-header hero-cascade-item hero-cascade-1 pointer-events-auto">
         <a className="hero-brand" href="https://arosha.au" aria-label="Arosha Kaluarachchi home">
           <span className="hero-avatar-wrap"><img src={githubProfile.avatar} alt="Arosha Kaluarachchi"/><i /></span>
           <span className="hero-identity"><b>Arosha Kaluarachchi</b><small>Senior Network Engineer · AI & Automation</small></span>
         </a>
       </header>
 
-      <aside className="absolute left-4 top-20 bottom-28 w-[244px] pointer-events-auto z-20">
+      <aside className="hero-cascade-item hero-cascade-3 absolute left-4 top-20 bottom-28 w-[244px] pointer-events-auto z-20">
         <div className="glass-dark rounded-2xl p-4 h-full flex flex-col gap-4 overflow-y-auto">
           <div className="text-[9px] tracking-[0.2em] uppercase text-text-muted font-semibold font-mono flex items-center gap-2">
             <Cpu size={12} className="text-cyan-glow" />
@@ -153,7 +156,7 @@ export function Dashboard({ active, onToggle, selected, onSelect, entries, overl
         </div>
       </aside>
 
-      <div className="absolute bottom-4 left-4 pointer-events-auto z-20">
+      <div className="hero-cascade-item hero-cascade-5 absolute bottom-4 left-4 pointer-events-auto z-20">
         <div className="glass-dark rounded-full px-3 py-2 flex items-center gap-2 text-[10px] font-mono text-text-secondary">
           <Layers size={12} className="text-cyan-glow" strokeWidth={1.6} />
           <span>{entries.length} NODES</span>
@@ -167,11 +170,15 @@ export function Dashboard({ active, onToggle, selected, onSelect, entries, overl
           <span className="text-text-primary">{[...active].join(" / ").toUpperCase()}</span>
         </div>
       </div>
-      <div className="absolute bottom-4 right-4 pointer-events-auto z-20">
+      <div className="hero-cascade-item hero-cascade-6 absolute bottom-4 right-4 pointer-events-auto z-20">
         <div className="glass-dark rounded-full px-3 py-2 text-[10px] font-mono text-text-muted">
           🖱 drag · scroll · hover pins
         </div>
       </div>
+      <LayerLoadingHUD
+        active={cableMeta.status === "loading" || marineMeta.status === "loading" || threatMeta.status === "loading"}
+        label={cableMeta.status === "loading" ? "TELEGEOGRAPHY CABLE MATRIX" : marineMeta.status === "loading" ? "MARINE INFRASTRUCTURE MATRIX" : "THREAT INTELLIGENCE UPLINK"}
+      />
     </>
   );
 

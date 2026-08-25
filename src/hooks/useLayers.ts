@@ -201,6 +201,10 @@ export interface ThreatRing {
   targets?: number;
   provider?: string;
 }
+export interface ThreatMeta {
+  status: "idle" | "loading" | "ready" | "error";
+  error?: string;
+}
 
 // Geolocate a batch of IPs via ipwho.is with limited concurrency
 async function geolocateBatch(ips: string[], concurrency = 5): Promise<ThreatRing[]> {
@@ -325,6 +329,7 @@ export function useLayers() {
     sourceUrl: CABLE_SOURCE_URL,
   });
   const [threats, setThreats] = useState<ThreatRing[]>([]);
+  const [threatMeta, setThreatMeta] = useState<ThreatMeta>({ status: "idle" });
   const [marine, setMarine] = useState<MarinePoint[]>([]);
   const [marineMeta, setMarineMeta] = useState<MarineMeta>({
     status: "idle",
@@ -361,7 +366,14 @@ export function useLayers() {
       });
   }, [active.has("cables")]);
   useEffect(() => {
-    if (active.has("threats")) loadThreats().then(setThreats).catch(() => {});
+    if (!active.has("threats")) return;
+    setThreatMeta({ status: "loading" });
+    loadThreats()
+      .then((points) => { setThreats(points); setThreatMeta({ status: "ready" }); })
+      .catch((error) => {
+        setThreats([]);
+        setThreatMeta({ status: "error", error: error instanceof Error ? error.message : "Threat feed unavailable" });
+      });
   }, [active.has("threats")]);
   useEffect(() => {
     if (!active.has("marine")) return;
@@ -419,5 +431,5 @@ export function useLayers() {
     [cities]
   );
 
-  return { active, toggle, activeEntries, arcsData, cables, cableMeta, threats, marine, marineMeta, home: data.home };
+  return { active, toggle, activeEntries, arcsData, cables, cableMeta, threats, threatMeta, marine, marineMeta, home: data.home };
 }

@@ -61,7 +61,7 @@ export function Timeline({ entries, onFlyTo }: TimelineProps) {
 
   return (
     <div className="absolute left-1/2 -translate-x-1/2 bottom-16 z-30 pointer-events-auto">
-      <div className="glass-dark rounded-2xl px-4 py-3 flex items-center gap-1 overflow-x-auto max-w-[85vw]">
+      <div className="hero-cascade-item hero-cascade-7 glass-dark rounded-2xl px-4 py-3 flex items-center gap-1 overflow-x-auto max-w-[85vw]">
         <span className="micro-label mr-3 whitespace-nowrap">TIMELINE</span>
         {timeline.map((e, i) => (
           <div key={e.id} className="flex items-center">

@@ -474,7 +474,7 @@ export function GlobeHero({
         ringRepeatPeriod={(r: any) => r.kind === "selection" ? 650 : 900}
         onGlobeClick={selectNearbyCable}
       /></div>
-      <div className="canvas-controls glass-dark" aria-label="Globe controls">
+      <div className="canvas-controls hero-cascade-item hero-cascade-2 glass-dark" aria-label="Globe controls">
         <button title="Zoom in" aria-label="Zoom in" onClick={() => adjustZoom(-.38)}><Plus size={12} /></button>
         <button title="Zoom out" aria-label="Zoom out" onClick={() => adjustZoom(.38)}><Minus size={12} /></button>
         <button title="Show whole world" aria-label="Show whole world" onClick={resetWorld}><RotateCcw size={11} /></button>
