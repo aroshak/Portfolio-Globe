@@ -11,6 +11,7 @@ import { CableInfoPanel } from "./CableInfoPanel";
 import { getEnrichedEntry, type EnrichedEntry } from "../data/enriched-entries";
 import { githubProfile } from "../data/github-repos";
 import { LayerLoadingHUD } from "./LayerLoadingHUD";
+import { EntitySatelliteHero } from "./EntitySatelliteHero";
 
 const TAB_COLOR: Record<string, string> = {
   education: "#4adede",
@@ -206,14 +207,10 @@ export function Dashboard({ active, onToggle, selected, onSelect, entries, overl
         <div className="glass-dark rounded-2xl h-full overflow-y-auto">
           <div className="panel-cascade flex flex-col gap-3 p-4">
 
-            {/* ── HERO: portfolio-owned identity, never external entity copy ── */}
+            {/* ── HERO: precise aerial site view, never unverified entity copy ── */}
             <div className="relative w-full h-40 rounded-xl overflow-hidden shrink-0 border"
               style={{ boxShadow: `0 8px 32px rgba(0,0,0,0.5), inset 0 0 0 1px ${color}33` }}>
-              <div className="absolute inset-0 overflow-hidden bg-space-deep">
-                <div className="absolute inset-0 opacity-80" style={{ background: `radial-gradient(circle at 20% 20%, ${color}55, transparent 38%), radial-gradient(circle at 85% 100%, ${color}22, transparent 45%), linear-gradient(135deg, #101923, #050810)` }} />
-                <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px)", backgroundSize: "24px 24px" }} />
-                <div className="absolute right-8 top-7 h-20 w-20 rounded-full border opacity-30" style={{ borderColor: color, boxShadow: `0 0 30px ${color}44, inset 0 0 20px ${color}33` }} />
-              </div>
+              <EntitySatelliteHero entry={enriched} accent={color} />
               <div className="absolute inset-0 bg-gradient-to-t from-[#060a12] via-[#060a12]/35 to-transparent" />
 
               {/* close */}

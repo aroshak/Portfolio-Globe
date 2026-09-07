@@ -9,6 +9,16 @@ test("side panel: entity search + photo + organized UI", async ({ page }) => {
   });
   page.on("pageerror", (err) => errors.push(`PAGEERROR: ${err.message}`));
 
+  // The app requests a same-origin satellite endpoint. Stub the bitmap here
+  // so the UI contract is tested without making CI depend on a live imagery
+  // provider; production retains the Nginx-cached upstream image.
+  await page.route("**/api/satellite/imagery**", async (route) => {
+    await route.fulfill({
+      contentType: "image/svg+xml",
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="600"><rect width="100%" height="100%" fill="#11343a"/></svg>',
+    });
+  });
+
   await page.goto("http://localhost:5100/", { waitUntil: "networkidle", timeout: 40000 });
   await page.waitForTimeout(4000); // intro fly-in
 
@@ -38,6 +48,12 @@ test("side panel: entity search + photo + organized UI", async ({ page }) => {
   await expect(hero.getByText("PORTFOLIO RECORD", { exact: true }).first()).toBeVisible();
   await expect(hero.getByText("Study breakdown", { exact: true })).toBeVisible();
   await expect(hero.getByText("Learning & capability", { exact: true })).toBeVisible();
+
+  // Mahanama is an independently pinned campus (rather than Colombo city
+  // centre), rendered as the reusable aerial view used by every card.
+  const satelliteHero = hero.getByTestId("entity-satellite-hero");
+  await expect(satelliteHero).toHaveAttribute("data-satellite-precision", "verified-site");
+  await expect(satelliteHero.getByTestId("entity-satellite-image")).toHaveAttribute("src", /\/api\/satellite\/imagery\?/);
 
   console.log("=== ERRORS ===");
   errors.forEach((e) => console.log(e));

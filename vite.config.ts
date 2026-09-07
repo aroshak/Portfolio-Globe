@@ -30,6 +30,14 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => `/api/v3/cable/${path.split("/").pop()}.json`,
       },
+      "/api/satellite/imagery": {
+        target: "https://server.arcgisonline.com",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(
+          /^\/api\/satellite\/imagery/,
+          "/ArcGIS/rest/services/World_Imagery/MapServer/export",
+        ),
+      },
     },
   },
   worker: { format: "es" },
